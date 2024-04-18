@@ -1,16 +1,21 @@
+html {
+    min-height: 100%;
+}
+
 body {
     margin: 0;
     background-color: black;
     font-family: Arial, Helvetica, sans-serif;
 }
 
-#touchSpace {
-    width: 80%;
-    height: 80%;
+#touchBackground {
+    width: 70%;
+    height: 50%;
     background-color: white;
     position: absolute;
-    top: 10%;
-    left: 10%;
+    top: 25%;
+    left: 15%;
+    visibility: hidden;
 }
 
 #countdownTimer {
@@ -38,4 +43,54 @@ body {
     top: 0%;
     left: 0%;
     position: absolute;
+}
+
+#touchSpace {
+    background-color: red;
+    width: 10em;
+    height: 10em;
+    position: absolute;
+    top: 50%;
+    right: 50%;
+    transform: translate(50%, -50%);
+    border-radius: 100%;
+}
+
+#infoPanel {
+    background-color: white;
+    position: absolute;
+    width: 70%;
+    height: 50%;
+    top: 25%;
+    left: 15%;
+    visibility: visible;
+    z-index: 1;
+}
+
+#resultPanel {
+    background-color: white;
+    position: absolute;
+    width: 70%;
+    height: 50%;
+    top: 25%;
+    left: 15%;
+    visibility: hidden;
+    z-index: 1;
+}
+
+#infoTitle,
+#resultsTitle {
+    font-size: x-large;
+}
+
+#infoText,
+#resultsText {
+    font-size: large;
+}
+
+#start,
+#restart {
+    width: 7em;
+    height: 2em;
+    font-size: large;
 }
