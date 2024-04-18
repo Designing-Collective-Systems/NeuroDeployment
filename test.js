@@ -1,4 +1,4 @@
-var secondsLeft = 30;
+var secondsLeft = 10;
 var touchStarted = 0;
 var touchCount = 0;
 const timer = setInterval(function () {
@@ -6,6 +6,8 @@ const timer = setInterval(function () {
     document.getElementById("timer").innerHTML = secondsLeft + "s";
     if (secondsLeft === 0) {
         clearInterval(timer);
+        document.getElementById("touchSpace").ontouchstart = null;
+        document.getElementById("touchSpace").ontouchend = null;
     }
     if (secondsLeft > 0) {
         document.getElementById("touchSpace").ontouchstart = function (e) {
