@@ -7,14 +7,16 @@ const timer = setInterval(function () {
     if (secondsLeft === 0) {
         clearInterval(timer);
     }
-    document.getElementById("touchSpace").ontouchstart = function (e) {
-        touchStarted = touchStarted + 1;
-    };
-    document.getElementById("touchSpace").ontouchend = function (e) {
-        if (touchStarted > 0) {
-            touchStarted = touchStarted - 1;
-            touchCount = touchCount + 1;
-            document.getElementById("count").innerHTML = touchCount;
-        }
-    };
+    if (secondsLeft >= 0) {
+        document.getElementById("touchSpace").ontouchstart = function (e) {
+            touchStarted = touchStarted + 1;
+        };
+        document.getElementById("touchSpace").ontouchend = function (e) {
+            if (touchStarted > 0) {
+                touchStarted = touchStarted - 1;
+                touchCount = touchCount + 1;
+                document.getElementById("count").innerHTML = touchCount;
+            }
+        };
+    }
 }, 1000);
