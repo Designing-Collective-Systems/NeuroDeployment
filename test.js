@@ -26,9 +26,11 @@ function defineElements() {
     document.getElementById("touchSpace").ontouchstart = function (e) {
         touchStarted = touchStarted + 1;
     };
+    /*
     document.getElementById("touchSpace").onmousedown = function (e) {
         touchStarted = touchStarted + 1;
     };
+    */
     document.getElementById("touchSpace").ontouchend = function (e) {
         if (touchStarted > 0) {
             touchStarted = touchStarted - 1;
@@ -48,6 +50,7 @@ function defineElements() {
             }
         }
     };
+    /*
     document.getElementById("touchSpace").onmouseup = function (e) {
         if (touchStarted > 0) {
             touchStarted = touchStarted - 1;
@@ -67,6 +70,7 @@ function defineElements() {
             }
         }
     };
+    */
 }
 
 function timerFunction() {
