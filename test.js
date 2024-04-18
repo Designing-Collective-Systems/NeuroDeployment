@@ -7,7 +7,7 @@ const timer = setInterval(function () {
     if (secondsLeft === 0) {
         clearInterval(timer);
     }
-    if (secondsLeft >= 0) {
+    if (secondsLeft > 0) {
         document.getElementById("touchSpace").ontouchstart = function (e) {
             touchStarted = touchStarted + 1;
         };
