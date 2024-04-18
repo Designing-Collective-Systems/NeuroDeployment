@@ -77,7 +77,8 @@ function timerFunction() {
     if (secondsLeft === maxTime) {
         defineElements();
     }
-    if (secondsLeft === -1) {
+    if (secondsLeft === 0) {
+        document.getElementById("timer").innerHTML = secondsLeft + "s";
         clearInterval(timer);
         document.getElementById("touchSpace").ontouchstart = null;
         document.getElementById("touchSpace").ontouchend = null;
@@ -101,6 +102,7 @@ document.getElementById("restart").onclick = function (e) {
     maxAccuracy = 0;
     minAccuracy = 100;
     totalAccuracy = 0;
+    document.getElementById("count").innerHTML = 0;
     document.getElementById("resultPanel").style.visibility = "hidden";
     secondsLeft = maxTime;
     // defineElements();
