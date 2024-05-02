@@ -74,6 +74,7 @@ function resartPhase() {
     maxAccuracy = 0;
     minAccuracy = 100;
     totalAccuracy = 0;
+    var resultText = "";
     document.getElementById("count").innerHTML = 0;
     document.getElementById("resultPanel").style.visibility = "hidden";
     secondsLeft = maxTime;
@@ -108,7 +109,7 @@ function changePosition() {
 }
 
 function resetPosition() {
-    maxTime = 5;
+    maxTime = 6;
     document.getElementById("touchSpace").style.top = "50%";
     document.getElementById("touchSpace").style.left = "50%";
 }
