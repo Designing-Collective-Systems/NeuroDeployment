@@ -74,7 +74,6 @@ function resartPhase() {
     maxAccuracy = 0;
     minAccuracy = 100;
     totalAccuracy = 0;
-    var resultText = "";
     document.getElementById("count").innerHTML = 0;
     document.getElementById("resultPanel").style.visibility = "hidden";
     secondsLeft = maxTime;
@@ -94,14 +93,15 @@ function displayResults() {
         document.getElementById("touchSpace").style.width = "100%";
         document.getElementById("touchSpace").style.height = "100%";
         document.getElementById("touchSpace").style.borderRadius = "0%";
+        resultText = "";
         resartPhase();
     }
 }
 
 function changePosition() {
     maxTime = 2;
-    newWidth = Math.random() * 85;
-    newHeight = Math.random() * 85;
+    newWidth = Math.random() * (85 - 15) + 15;
+    newHeight = Math.random() * (85 - 15) + 15;
     centerTouchX = newWidth * window.innerWidth;
     centerTouchY = newHeight * window.innerHeight;
     document.getElementById("touchSpace").style.top = newHeight.toString() + "%";
@@ -142,8 +142,8 @@ function timerFunction() {
 
         // small circle - finger size
         if (numberOfPhases === maxPhases - 7) {
-            document.getElementById("touchSpace").style.width = "0.5in";
-            document.getElementById("touchSpace").style.height = "0.5in";
+            document.getElementById("touchSpace").style.width = "0.7in";
+            document.getElementById("touchSpace").style.height = "0.7in";
             document.getElementById("touchSpace").style.borderRadius = "50%";
             resartPhase();
         }
@@ -155,8 +155,8 @@ function timerFunction() {
 
         // tiny circle - half finger size
         if (numberOfPhases === maxPhases - 11) {
-            document.getElementById("touchSpace").style.width = "0.25in";
-            document.getElementById("touchSpace").style.height = "0.25in";
+            document.getElementById("touchSpace").style.width = "0.35in";
+            document.getElementById("touchSpace").style.height = "0.35in";
             document.getElementById("touchSpace").style.borderRadius = "50%";
             resartPhase();
         }
