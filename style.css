@@ -53,8 +53,8 @@ body {
     height: 100%;
     position: absolute;
     top: 50%;
-    right: 50%;
-    transform: translate(50%, -50%);
+    left: 50%;
+    transform: translate(-50%, -50%);
     border-radius: 0%;
 }
 
@@ -73,7 +73,7 @@ body {
     background-color: white;
     position: absolute;
     width: 70%;
-    height: 50%;
+    height: 60%;
     top: 25%;
     left: 15%;
     visibility: hidden;
