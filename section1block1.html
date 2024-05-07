@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE-edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="style.css" rel="stylesheet" />
+    <title>Full Screen Tapping</title>
+</head>
+
+<body>
+    <div id="infoPanel">
+        <span id="infoTitle">Full Screen Tapping - Normal</span>
+        <br><br>
+        <span id="infoText">Tap in the red area as many times as you can before the timer runs out!</span>
+        <br><br>
+        <button id="start" value="s1b1" onclick="onClickStart(this.value)">Start</button>
+        <br><br>
+        <a href="section1.html">
+            <button class="sectionButton">Back</button>
+        </a>
+        <br><br>
+    </div>
+
+
+    <div id="touchBackground">
+        <div id="countdownTimer">
+            <span id="timer"></span>
+        </div>
+        <div id="scoreCounter">
+            <span id="count">0</span>
+        </div>
+        <div id="touchSpace"></div>
+    </div>
+
+
+    <div id="resultPanel">
+        <span id="resultsTitle">Results</span>
+        <span id="resultsText"></span>
+        <br />
+        <br />
+        <button id="restart">Restart</button>
+    </div>
+    <script src="test.js"> </script>
+</body>
+
+</html>

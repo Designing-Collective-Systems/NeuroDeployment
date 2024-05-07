@@ -58,41 +58,37 @@ body {
     border-radius: 0%;
 }
 
-#infoPanel {
-    background-color: white;
-    position: absolute;
-    width: 70%;
-    height: 50%;
-    top: 25%;
-    left: 15%;
-    visibility: visible;
-    z-index: 1;
-}
-
-#resultPanel {
+#infoPanel,
+#resultPanel,
+#homeButtons {
     background-color: white;
     position: absolute;
     width: 70%;
     height: 60%;
     top: 25%;
     left: 15%;
-    visibility: hidden;
+    visibility: visible;
     z-index: 1;
+    text-align: center;
+}
+
+#resultPanel {
+    visibility: hidden;
+}
+
+.homeContent {
+    margin: auto;
 }
 
 #infoTitle,
-#resultsTitle {
+#resultsTitle,
+.taskTitle {
     font-size: x-large;
 }
 
-#infoText,
-#resultsText {
-    font-size: large;
-}
-
 #start,
-#restart {
-    width: 7em;
-    height: 2em;
-    font-size: large;
+#restart,
+.sectionButton {
+    width: 10em;
+    height: 3em;
 }

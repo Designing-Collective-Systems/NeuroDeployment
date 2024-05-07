@@ -6,40 +6,31 @@
   <meta http-equiv="X-UA-Compatible" content="IE-edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link href="style.css" rel="stylesheet" />
-  <title>Touch Events Example</title>
-  <script src="test.js" defer> </script>
+  <title>Cognition Home Page</title>
 </head>
 
 <body>
-  <div id="infoPanel">
-    <span id="infoTitle">Rapid Tapping</span>
-    <br />
-    <span id="infoText">Tap in the red area as many times as you can before the timer runs out!</span>
-    <br />
-    <br />
-    <button id="start">Start</button>
-  </div>
-
-
-  <div id="touchBackground">
-    <div id="countdownTimer">
-      <span id="timer"></span>
+  <div id="homeButtons">
+    <div class="homeContent">
+      <span class="taskTitle">Select Any Task</span> <br><br>
+      <a href="section1.html">
+        <button class="sectionButton">Full Screen Tasks</button>
+      </a>
+      <br><br>
+      <a href="section2.html">
+        <button class="sectionButton">Big Dot Tasks</button>
+      </a>
+      <br><br>
+      <a href="section1.html">
+        <button class="sectionButton">Small Dot Tasks</button>
+      </a>
+      <br><br>
+      <a href="section1.html">
+        <button class="sectionButton">Tiny Dot Tasks</button>
+      </a>
+      <br><br>
     </div>
-    <div id="scoreCounter">
-      <span id="count">0</span>
-    </div>
-    <div id="touchSpace"></div>
   </div>
-
-
-  <div id="resultPanel">
-    <span id="resultsTitle">Results</span>
-    <span id="resultsText"></span>
-    <br />
-    <br />
-    <button id="restart">Restart</button>
-  </div>
-
 </body>
 
 </html>

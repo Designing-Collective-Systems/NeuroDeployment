@@ -9,15 +9,18 @@ var maxDistance = Math.sqrt(window.innerWidth * window.innerWidth + window.inner
 var maxAccuracy = 0;
 var minAccuracy = 100;
 var totalAccuracy = 0;
-var maxPhases = 15;
+var maxPhases = 1;
 var numberOfPhases = maxPhases;
 const results = [];
+const distances = [];
 var centerTouchX = 0.5 * window.innerWidth;
 var centerTouchY = 0.5 * window.innerHeight;
 var resultText = "";
 var currentPhase = ["Full Screen 1: ", "Full Screen 2: ", "Full Screen 3: ", "Big Dot 1: ", "Big Dot 2: ", "Big Dot 3: ",
     "Big Dot 4: ", "Small Dot 1: ", "Small Dot 2: ", "Small Dot 3: ", "Small Dot 4: ", "Tiny Dot 1: ",
     "Tiny Dot 2: ", "Tiny Dot 3: ", "Tiny Dot 4: "];
+var section = 0;
+var block = 0;
 
 // Function to calculate distance between two points
 function calculateDistance(x1, y1, x2, y2) {
@@ -43,7 +46,8 @@ function defineElements() {
             document.getElementById("count").innerHTML = touchCount;
             xCoord = e.changedTouches[0].pageX;
             yCoord = e.changedTouches[0].pageY;
-            tapDistance = calculateDistance(window.innerWidth, window.innerHeight, xCoord, yCoord);
+            tapDistance = calculateDistance(centerTouchX, centerTouchY, xCoord, yCoord);
+            distances[touchCount - 1] = tapDistance;
             totalDistance = totalDistance + tapDistance;
             tapAccuracy = calculateAccuracy(tapDistance);
             totalAccuracy = totalAccuracy + tapAccuracy;
@@ -85,11 +89,9 @@ function displayResults() {
     document.getElementById("touchSpace").onmousedown = null;
     document.getElementById("touchSpace").onmouseup = null;
     document.getElementById("resultPanel").style.visibility = "visible";
-    //document.getElementById("resultsText").innerHTML = "<br />Total number of taps: " + touchCount + "<br />Highest tap accuracy: " + Math.round(maxAccuracy * 10000) / 10000 + "<br />Lowest tap accuracy: " + Math.round(minAccuracy * 10000) / 10000 + "<br />Average tap accuracy: " + Math.round(averageAccuracy * 10000) / 10000;
-    //document.getElementById("resultsText").innerHTML = "<br />T1.1: " + results[0][0] + "<br />T1.2: " + results[1][0] + "<br />T1.3: " + results[2][0] + "<br />T2: " + results[3][0] + "<br />T3: " + results[4][0] + "<br />T4: " + results[5][0];
     document.getElementById("resultsText").innerHTML = resultText;
     document.getElementById("restart").onclick = function (e) {
-        numberOfPhases = maxPhases;
+        numberOfPhases = 1;
         document.getElementById("touchSpace").style.width = "100%";
         document.getElementById("touchSpace").style.height = "100%";
         document.getElementById("touchSpace").style.borderRadius = "0%";
@@ -114,6 +116,7 @@ function resetPosition() {
     document.getElementById("touchSpace").style.left = "50%";
 }
 
+/*
 function timerFunction() {
     if (secondsLeft === maxTime) {
         defineElements();
@@ -176,9 +179,35 @@ function timerFunction() {
         secondsLeft--;
     }
 }
+*/
 
-document.getElementById("start").onclick = function (e) {
-    document.getElementById("infoPanel").style.visibility = "hidden";
-    document.getElementById("touchBackground").style.visibility = "visible";
-    const timer = setInterval(timerFunction, 1000);
+function timerFunction() {
+    if (secondsLeft === maxTime) {
+        defineElements();
+    }
+    if (secondsLeft === 0) {
+        document.getElementById("timer").innerHTML = secondsLeft + "s";
+        clearInterval(timer);
+        numberOfPhases = numberOfPhases - 1;
+        storeResults();
+        resetPosition();
+        if (numberOfPhases === 0) {
+            displayResults();
+        }
+    }
+    else {
+        document.getElementById("timer").innerHTML = secondsLeft + "s";
+        secondsLeft--;
+    }
 }
+
+function onClickStart(sectionBlock) {
+    if (sectionBlock === "s1b1") {
+        document.getElementById("infoPanel").style.visibility = "hidden";
+        document.getElementById("touchBackground").style.visibility = "visible";
+        const timer = setInterval(timerFunction, 1000);
+    }
+
+}
+
+
