@@ -58,18 +58,25 @@ body {
     border-radius: 0%;
 }
 
-#infoPanel,
+#infoPanel-1,
+#infoPanel-2,
+#infoPanel-3,
 #resultPanel,
 #homeButtons {
     background-color: white;
     position: absolute;
-    width: 70%;
-    height: 60%;
-    top: 25%;
-    left: 15%;
+    width: 80%;
+    height: 80%;
+    top: 10%;
+    left: 10%;
     visibility: visible;
     z-index: 1;
     text-align: center;
+}
+
+#infoPanel-2,
+#infoPanel-3 {
+    visibility: hidden;
 }
 
 #resultPanel {
@@ -91,4 +98,8 @@ body {
 .sectionButton {
     width: 10em;
     height: 3em;
+}
+
+#domPri {
+    height: 10em;
 }
