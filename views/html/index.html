@@ -8,7 +8,28 @@
   <link href="style.css" rel="stylesheet" />
   <title>Cognition Study Landing Page</title>
 </head>
+
 <body>
-	
+  <h1>Welcome to the Cognition Study</h1>
+  
+  <p>Please select an action:</p>
+  
+  <div>
+    <button id="registerButton">Register</button>
+    <button id="loginButton">Login</button>
+  </div>
+
+  <script>
+    // Redirect to registration page
+    document.getElementById('registerButton').addEventListener('click', function() {
+      window.location.href = '/register.html';
+    });
+
+    // Redirect to login page
+    document.getElementById('loginButton').addEventListener('click', function() {
+      window.location.href = '/login.html';
+    });
+  </script>
 </body>
+
 </html>

@@ -24,6 +24,7 @@ function setupSocket(io) {
         });
 
         socket.on('go', (roomId) => {
+            // send msg by io to clients in the same room
             io.to(roomId).emit('go');
         });
 

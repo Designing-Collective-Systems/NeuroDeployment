@@ -2,57 +2,37 @@
 <html>
 <head>
   <title>Login</title>
-  <script src="/socket.io/socket.io.js"></script>
-  <script>
-    // Generate or get a unique identifier
-    function getOrCreateUserId() {
-      let userId = localStorage.getItem('userId');
-      if (!userId) {
-        userId = 'user-' + Date.now() + '-' + Math.floor(Math.random() * 1000);
-        localStorage.setItem('userId', userId);
-      }
-      return userId;
-    }
-  </script>
 </head>
 <body>
   <h1>Login</h1>
-  <form id="uploadForm" enctype="multipart/form-data">
-    <input type="file" name="avatar" id="avatar" required>
-    <input type="text" name="caption" id="caption" placeholder="Enter caption" required>
-    <input type="text" name="userType" id="userType" placeholder="Enter user type (user/monitor)" required>
-    <button type="submit">Upload</button>
+  <form id="loginForm">
+    <input type="text" name="username" id="username" placeholder="Enter username" required>
+    <input type="password" name="password" id="password" placeholder="Enter password" required>
+    <button type="submit">Login</button>
   </form>
-  <ul id="messagesList"></ul>
 
   <script>
-    const socket = io();
-    const userId = getOrCreateUserId();
-
-    document.getElementById('uploadForm').addEventListener('submit', (e) => {
+    document.getElementById('loginForm').addEventListener('submit', (e) => {
       e.preventDefault();
-      const formData = new FormData(document.getElementById('uploadForm'));
-      fetch('/upload', {
+      const username = document.getElementById('username').value;
+      const password = document.getElementById('password').value;
+
+      // Submit to the server for login authentication by HTTP POST 
+      fetch('/login', {
         method: 'POST',
-        body: formData
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password })
       })
       .then(res => res.json())
       .then(data => {
-        console.log('Upload response:', data);  // Log JSON response
-        if (data.file) {
-          const userType = document.getElementById('userType').value;
-          socket.emit('register', userType, {
-            userId: userId,
-            avatar: data.file,
-            caption: document.getElementById('caption').value
-          });
-          if (userType === 'user') {
-            window.location.href = '/patient.html';
-          } else if (userType === 'monitor') {
-            window.location.href = '/monitor.html';
+        if (data.success) {
+          if (data.userType ==='patient'){
+              window.location.href = '/patient.html';  
+          } else if (data.userType === 'caregiver') {
+              window.location.href = '/monitor.html'; 
           }
         } else {
-          alert(data.msg);
+          alert('Login failed: ' + data.message);
         }
       })
       .catch(error => console.error('Error:', error));
