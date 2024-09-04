@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE-edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cognition Study Instructions Page</title>
+</head>
+<body class="text-body">
+  <h1 class="title">Instructions</h1>
+  <ol class="instructions">
+    <li>The aim of this task is to slide your finger from one circle to another.</li>
+    <li>Start the task by placing your finger on the circle with the number 1 in it.</li>
+    <li>Slide your finger from 1 to the circle with the letter A. After this, go to the circle with 2.</li>
+    <li>Continue moving in this pattern – number first, followed by a letter until you complete the task.</li>
+    <li>Do not lift your finger from the screen while performing this task.</li>
+    <li>You will be asked to repeat this task 4 times in total.</li>
+  </ol>
+
+  <button id="startButton" disabled type="button">Start Test</button>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    const socket = io();
+
+    // register as patient
+    socket.emit('register', 'patient');
+
+    socket.on('go', () => {
+            alert('Test started! You can now begin the test.');
+
+            window.location.href = '/test.html'; 
+        });
+  </script>
+</body>
+</html>
