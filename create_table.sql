@@ -1,7 +1,7 @@
 CREATE TABLE IF NOT EXISTS public.test_results
 (
     id SERIAL PRIMARY KEY,
-    patientid integer NOT NULL,
+    pid integer NOT NULL,
     coordx integer,
     coordy integer,
     coordt integer,

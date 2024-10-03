@@ -2,7 +2,7 @@
 
 let startTime; // beginning of first touch
 
-let participantID;
+let pid;
 let blockno;
 let trialno = -1;
 
@@ -35,7 +35,7 @@ const getIDBlock = async function () {
     return data;
 }
 
-//console.log(participantID);
+//console.log(pid);
 //console.log(blockno);
 let end = 0;
 
@@ -45,94 +45,51 @@ function currentTime() {
 
 
 function placePoints(i) {
-    let x1 = 0;
-    let y1 = 0;
-    let x2 = 0;
-    let y2 = 0;
-    if (i == 0) {
-        x1 = Math.random() * (window.innerWidth / 2 - 100);
-        y1 = Math.random() * (window.innerHeight / 2 - 100);
-        x2 = (window.innerWidth / 2) + (Math.random() * (window.innerWidth / 2 - 100));
-        y2 = (Math.random() * (window.innerHeight / 2 - 100));
+    let x1 = 0; // Real node x
+    let y1 = 0; // Real node y
+    let x2 = 0; // Fake node x
+    let y2 = 0; // Fake node y
 
-        if (Math.abs(Math.atan2(middley - y1, middlex - x1) * 180 / Math.PI - Math.atan2(middley - y2, middlex - x2) * 180 / Math.PI) < minAngle) {
-            placePoints(i)
-        }
-        else {
-            checkpointPairsCoords.push([[x1, y1], [x2, y2]]);
-        }
-    }
-    else {
-        if (checkpointPairsCoords[i - 1][0][0] < (window.innerWidth / 2) && checkpointPairsCoords[i - 1][0][1] < (window.innerHeight / 2)) {
-            x1 = Math.random() * (window.innerWidth - 100);
-            if (x1 < (window.innerWidth / 2)) {
-                y1 = (window.innerHeight / 2) + (Math.random() * (window.innerHeight / 2 - 100));
-                x2 = (window.innerWidth / 2) + (Math.random() * (window.innerWidth / 2 - 100));
-                y2 = (Math.random() * (window.innerHeight - 100));
-            }
-            else {
-                y1 = (Math.random() * (window.innerHeight - 100));
-                x2 = (Math.random() * (window.innerWidth / 2 - 100));
-                y2 = (window.innerHeight / 2) + (Math.random() * (window.innerHeight / 2 - 100));
-            }
-        }
+    // Get window dimensions
+    const screenWidth = window.innerWidth;
+    const screenHeight = window.innerHeight;
 
-        if (checkpointPairsCoords[i - 1][0][0] > (window.innerWidth / 2) && checkpointPairsCoords[i - 1][0][1] < (window.innerHeight / 2)) {
-            x1 = Math.random() * (window.innerWidth - 100);
-            if (x1 > (window.innerWidth / 2)) {
-                y1 = (window.innerHeight / 2) + (Math.random() * (window.innerHeight / 2 - 100));
-                x2 = (Math.random() * (window.innerWidth / 2 - 100));
-                y2 = (Math.random() * (window.innerHeight - 100));
-            }
-            else {
-                y1 = (Math.random() * (window.innerHeight - 100));
-                x2 = (window.innerWidth / 2) + (Math.random() * (window.innerWidth / 2 - 100));
-                y2 = (window.innerHeight / 2) + (Math.random() * (window.innerHeight / 2 - 100));
-            }
-        }
+    // Define fixed relative positions for real and fake nodes in opposite corners/sides
+    const fixedRelativePositions = [
+        [[10, 10], [60, 30]],     // Real: A, Fake: 2
+        [[70, 60], [55, 20]],     // Real: 2, Fake: B
+        [[10, 75], [70, 30]],     // B
+        [[20, 30], [50, 30]],     // 3
+        [[70, 40], [20, 70]],     // C
+        [[60, 10], [10, 50]],     // 4
+        [[10, 70], [30, 10]],     // Real: D, Fake: 5
+        [[70, 10], [60, 50]],     // 5
+        [[20, 70], [75, 30]],     // E
+        [[50, 70], [30, 20]],     // 6
+        [[70, 70], [10, 10]],     // 
+        [[70, 70], [10, 10]],     // 
+    ];
 
-        if (checkpointPairsCoords[i - 1][0][0] < (window.innerWidth / 2) && checkpointPairsCoords[i - 1][0][1] > (window.innerHeight / 2)) {
-            x1 = Math.random() * (window.innerWidth - 100);
-            if (x1 < (window.innerWidth / 2)) {
-                y1 = (Math.random() * (window.innerHeight / 2 - 100));
-                x2 = (window.innerWidth / 2) + (Math.random() * (window.innerWidth / 2 - 100));
-                y2 = (Math.random() * (window.innerHeight - 100));
-            }
-            else {
-                y1 = (Math.random() * (window.innerHeight - 100));
-                x2 = (Math.random() * (window.innerWidth / 2 - 100));
-                y2 = (Math.random() * (window.innerHeight / 2 - 100));
-            }
-        }
+    // Use the fixed positions based on the iteration, scale them to the current screen size
+    if (i < fixedRelativePositions.length) {
+        // Scale percentages to actual pixel coordinates for real node
+        x1 = (fixedRelativePositions[i][0][0] / 100) * screenWidth;
+        y1 = (fixedRelativePositions[i][0][1] / 100) * screenHeight;
 
-        if (checkpointPairsCoords[i - 1][0][0] > (window.innerWidth / 2) && checkpointPairsCoords[i - 1][0][1] > (window.innerHeight / 2)) {
-            x1 = Math.random() * (window.innerWidth - 100);
-            if (x1 > (window.innerWidth / 2)) {
-                y1 = (Math.random() * (window.innerHeight / 2 - 100));
-                x2 = (Math.random() * (window.innerWidth / 2 - 100));
-                y2 = (Math.random() * (window.innerHeight - 100));
-            }
-            else {
-                y1 = (Math.random() * (window.innerHeight - 100));
-                x2 = (window.innerWidth / 2) + (Math.random() * (window.innerWidth / 2 - 100));
-                y2 = (Math.random() * (window.innerHeight / 2 - 100));
-            }
-        }
-        if (Math.abs(Math.atan2(checkpointPairsCoords[i - 1][0][1] - y1, checkpointPairsCoords[i - 1][0][0] - x1) * 180 / Math.PI - Math.atan2(checkpointPairsCoords[i - 1][0][1] - y2, checkpointPairsCoords[i - 1][0][0] - x2) * 180 / Math.PI) < minAngle) {
-            placePoints(i)
-        }
-        else {
-            checkpointPairsCoords.push([[x1, y1], [x2, y2]]);
-        }
+        // Scale percentages to actual pixel coordinates for fake node
+        x2 = (fixedRelativePositions[i][1][0] / 100) * screenWidth;
+        y2 = (fixedRelativePositions[i][1][1] / 100) * screenHeight;
+        checkpointPairsCoords.push([[x1, y1], [x2, y2]]);
+    } else {
+        // console.error("No more fixed positions available for iteration: " + i);
     }
 }
-
 
 
 function endblock() {
     console.log("endblock");
     var data = { // create data object
-        participantid: [],
+        pid: [],
         blockno: [],
         coordx: [],
         coordy: [],
@@ -153,10 +110,10 @@ function endblock() {
     blockno = blockno + 1;
     console.log(blockno);
     for (const coord of coords) { // add coords to data object
-        data.participantid.push(participantID);
+        data.pid.push(pid);
         data.blockno.push(blockno);
-        data.coordx.push(coord[0]);
-        data.coordy.push(coord[1]);
+        data.coordx.push(Math.round(coord[0]));
+        data.coordy.push(Math.round(coord[1]));
         data.coordt.push(coord[2]);
         data.realpointid.push(coord[3]);
         data.realpointx.push(coord[4]);
@@ -200,11 +157,11 @@ function placeChecks() {
 
 getIDBlock().then(data => {
     console.log(data); // Logs the data after the promise is resolved
-    participantID = data.participantID;
+    pid = data.pid;
     blockno = data.blockno;
 
     if (blockno === blockLimit) {
-        participantID = participantID + 1;
+        pid = pid + 1;
         blockno = 0;
     }
 

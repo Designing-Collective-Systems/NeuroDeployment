@@ -1,7 +1,7 @@
 CREATE TABLE test_results
 (
     id serial,
-    patientid integer,
+    pid integer,
     blockno integer,
     coordx integer,
     coordy integer,

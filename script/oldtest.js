@@ -2,7 +2,7 @@
 
 let startTime; // beginning of first touch
 
-let participantID;
+let pid;
 let blockno;
 
 const blockLimit = 4;
@@ -30,7 +30,7 @@ const getIDBlock = async function () {
 	return data;
 }
 
-//console.log(participantID);
+//console.log(pid);
 //console.log(blockno);
 let end = 0;
 
@@ -144,7 +144,7 @@ function placePoints(pair) {
 function endblock() {
 	console.log("endblock");
 	var data = { // create data object
-		patientid: [],
+		pid: [],
 		blockno: [],
 		coordx: [],
 		coordy: [],
@@ -165,7 +165,7 @@ function endblock() {
 	blockno = blockno + 1;
 	console.log(blockno);
 	for (const coord of coords) { // add coords to data object
-		data.patientid.push(participantID);
+		data.pid.push(pid);
 		data.blockno.push(blockno);
 		data.coordx.push(coord[0]);
 		data.coordy.push(coord[1]);
@@ -202,11 +202,11 @@ function endblock() {
 
 getIDBlock().then(data => {
 	console.log(data); // Logs the data after the promise is resolved
-	participantID = data.participantID;
+	pid = data.pid;
 	blockno = data.blockno;
 
 	if (blockno === blockLimit) {
-		participantID = participantID + 1;
+		pid = pid + 1;
 		blockno = 0;
 	}
 

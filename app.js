@@ -4,13 +4,13 @@ const url = require('node:url');
 const pg = require('pg');
 
 var blockno;
-var participantID;
+var pid;
 
 // const hostname = 'https://cognition-a0e89b43ca6a.herokuapp.com/' || 'localhost';
 const port = process.env.PORT || 8080;
 
 const pgClient = new pg.Client({
-	connectionString: process.env.DATABASE_URL || 'postgresql://postgres:1234@localhost:5432/cognition',
+	connectionString: process.env.DATABASE_URL || 'postgresql://postgres:admin@localhost:5432/cognition',
 	ssl: process.env.DATABASE_URL ? { rejectUnauthorized: false } : false
 	//ssl: process.env.DATABASE_URL ? true : false
 
@@ -22,8 +22,15 @@ const pgClient = new pg.Client({
 	}*/
 });
 
-pgClient.connect();
-
+pgClient.connect(err => {
+	if (err) {
+		// Log error if connection fails
+		console.error('Connection to PostgreSQL failed:', err.stack);
+	} else {
+		// Log success message if connection is successful
+		console.log('Connected to PostgreSQL');
+	}
+});
 const server = http.createServer((req, res) => {
 	const pathname = url.parse(req.url).pathname;
 
@@ -67,7 +74,7 @@ const server = http.createServer((req, res) => {
 				const resp = await pgClient.query('SELECT * FROM test_results ORDER BY Id DESC LIMIT 1');
 				//console.log(resp.rows[0]);
 				const obj = {
-					participantID: resp.rows[0].patientid,
+					pid: resp.rows[0].pid,
 					blockno: resp.rows[0].blockno,
 				};
 				res.end(JSON.stringify(obj));
@@ -88,11 +95,12 @@ const server = http.createServer((req, res) => {
 			try {
 				const data = JSON.parse(body);
 
+
 				// Insert data into the database
 				for (let i = 0; i < data.coordx.length; i++) {
 					await pgClient.query(
-						'INSERT INTO test_results (patientid, blockno, coordx, coordy, coordt, realpointid, realpointx, realpointy, fakepointid, fakepointx, fakepointy, speed, pausevalue, correctangle, wrongangle, err, errorcorrected) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)',
-						[data.participantid[i], data.blockno[i], data.coordx[i], data.coordy[i], data.coordt[i], data.realpointid[i], data.realpointx[i], data.realpointy[i], data.fakepointid[i], data.fakepointx[i], data.fakepointy[i], data.speed[i], data.pause[i], data.correctangle[i], data.wrongangle[i], data.error[i], data.errorcorrected[i]]
+						'INSERT INTO test_results (pid, blockno, coordx, coordy, coordt, realpointid, realpointx, realpointy, fakepointid, fakepointx, fakepointy, speed, pausevalue, correctangle, wrongangle, err, errorcorrected) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)',
+						[data.pid[i], data.blockno[i], data.coordx[i], data.coordy[i], data.coordt[i], data.realpointid[i], data.realpointx[i], data.realpointy[i], data.fakepointid[i], data.fakepointx[i], data.fakepointy[i], data.speed[i], data.pause[i], data.correctangle[i], data.wrongangle[i], data.error[i], data.errorcorrected[i]]
 					);
 				}
 
