@@ -144,7 +144,7 @@ function placePoints(pair) {
 function endblock() {
 	console.log("endblock");
 	var data = { // create data object
-		patientid: [],
+		participantid: [],
 		blockno: [],
 		coordx: [],
 		coordy: [],
@@ -165,7 +165,7 @@ function endblock() {
 	blockno = blockno + 1;
 	console.log(blockno);
 	for (const coord of coords) { // add coords to data object
-		data.patientid.push(participantID);
+		data.participantid.push(participantID);
 		data.blockno.push(blockno);
 		data.coordx.push(coord[0]);
 		data.coordy.push(coord[1]);

@@ -1,7 +1,7 @@
-CREATE TABLE IF NOT EXISTS public.test_results
+CREATE TABLE IF NOT EXISTS test_results
 (
     id SERIAL PRIMARY KEY,
-    patientid integer NOT NULL,
+    participantid integer NOT NULL,
     coordx integer,
     coordy integer,
     coordt integer,
@@ -15,5 +15,5 @@ CREATE TABLE IF NOT EXISTS public.test_results
 
 TABLESPACE pg_default;
 
-ALTER TABLE IF EXISTS public.test_results
+ALTER TABLE IF EXISTS test_results
     OWNER to postgres;

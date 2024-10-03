@@ -1,6 +1,6 @@
-CREATE TABLE pairs (
+CREATE TABLE IF NOT EXISTS pairs (
     id SERIAL PRIMARY KEY,
-    patient_id INTEGER REFERENCES users(id),
     caregiver_id INTEGER REFERENCES users(id),
-    room_id TEXT
+    participant_id INTEGER REFERENCES users(id),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

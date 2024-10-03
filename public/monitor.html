@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Monitor</title>
+    <script src="/socket.io/socket.io.js"></script>
+  </head>
+  <body>
+    <h1>Monitor Panel</h1>
+
+    <input type="text" id="participantUsername" placeholder="Enter participant User Name" />
+    <button id="bindparticipant">Bind participant</button>
+
+    <button id="goButton" disabled>Go</button>
+
+    <script>
+      const socket = io();
+      let caregiverId = sessionStorage.getItem('caregiverId');
+      let roomId;
+
+      document.getElementById("bindparticipant").addEventListener("click", () => {
+        const participantUsername = document.getElementById("participantUsername").value;
+        if (!participantUsername) {
+          alert("Please enter a participant username.");
+          return;
+        }
+
+        socket.emit("bindparticipantByUsername", {
+          caregiverId: caregiverId,
+          participantUsername: participantUsername,
+        });
+
+        console.log("Attempting to bind participant:", participantUsername, "with caregiver:", caregiverId);
+      });
+
+      socket.on("bindingSuccess", (data) => {
+        roomId = data.roomId;
+        console.log("Binding success, room ID:", roomId);
+        document.getElementById("goButton").disabled = false; 
+      });
+
+      socket.on("bindingError", (error) => {
+        alert("Error binding participant: " + error.msg);
+      });
+
+      document.getElementById("goButton").addEventListener("click", () => {
+        if (roomId) {
+          socket.emit("go", roomId);
+        } else {
+          alert("You need to bind a participant first!");
+        }
+      });
+    </script>
+  </body>
+</html>

@@ -1,4 +1,4 @@
-id,patientid,blockno,coordx,coordy,coordt,realpointid,realpointx,realpointy,fakepointid,fakepointx,fakepointy,speed,pausevalue,correctangle,wrongangle,err,errorcorrected
+id,participantid,blockno,coordx,coordy,coordt,realpointid,realpointx,realpointy,fakepointid,fakepointx,fakepointy,speed,pausevalue,correctangle,wrongangle,err,errorcorrected
 13860,0,3,222,799,1,checkpointA,321.48126220703125,252.91250610351562,checkpoint2Fake,54.07500076293945,17.625,0.0,0,0.0,0.0,0,0
 13861,0,3,223,788,404,checkpointA,321.48126220703125,252.91250610351562,checkpoint2Fake,54.07500076293945,17.625,0.027407843715104865,403,10.21415131118687,14.984470316149915,0,0
 13862,0,3,224,784,423,checkpointA,321.48126220703125,252.91250610351562,checkpoint2Fake,54.07500076293945,17.625,0.21700555924303477,19,1.590630441502895,24.04690829020756,0,0

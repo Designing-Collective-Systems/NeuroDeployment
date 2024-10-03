@@ -6,6 +6,7 @@ const session = require('express-session');
 const bodyParser = require('body-parser');
 const routes = require('./routes'); 
 const { setupSocket } = require('./socket'); 
+const path = require('path'); 
 
 const app = express();
 const server = http.createServer(app);
@@ -17,7 +18,7 @@ app.use(bodyParser.json());
 app.use(session({ secret: 'secretKey', resave: false, saveUninitialized: true }));
 
 // using static file
-app.use(express.static('public'));
+app.use(express.static(path.join(__dirname, 'public')));
 
 // set routes
 app.use('/', routes);

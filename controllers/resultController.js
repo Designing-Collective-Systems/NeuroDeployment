@@ -5,7 +5,7 @@ exports.getLatestResult = async (req, res) => {
     try {
         const resp = await pgClient.query('SELECT * FROM test_results ORDER BY id DESC LIMIT 1');
         const obj = {
-            participantID: resp.rows[0].patientid,
+            participantID: resp.rows[0].participantid,
             blockno: resp.rows[0].blockno,
         };
         res.json(obj);
@@ -29,8 +29,8 @@ exports.submitResult = async (req, res) => {
 
             for (let i = 0; i < data.coordx.length; i++) {
                 await pgClient.query(
-                    'INSERT INTO test_results (patientid, blockno, coordx, coordy, coordt, realpointid, realpointx, realpointy, fakepointid, fakepointx, fakepointy, speed, pausevalue, correctangle, wrongangle, err, errorcorrected) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)',
-                    [data.patientid[i], data.blockno[i], data.coordx[i], data.coordy[i], data.coordt[i], data.realpointid[i], data.realpointx[i], data.realpointy[i], data.fakepointid[i], data.fakepointx[i], data.fakepointy[i], data.speed[i], data.pause[i], data.correctangle[i], data.wrongangle[i], data.error[i], data.errorcorrected[i]]
+                    'INSERT INTO test_results (participantid, blockno, coordx, coordy, coordt, realpointid, realpointx, realpointy, fakepointid, fakepointx, fakepointy, speed, pausevalue, correctangle, wrongangle, err, errorcorrected) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)',
+                    [data.participantid[i], data.blockno[i], data.coordx[i], data.coordy[i], data.coordt[i], data.realpointid[i], data.realpointx[i], data.realpointy[i], data.fakepointid[i], data.fakepointx[i], data.fakepointy[i], data.speed[i], data.pause[i], data.correctangle[i], data.wrongangle[i], data.error[i], data.errorcorrected[i]]
                 );
             }
 

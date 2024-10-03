@@ -11,7 +11,7 @@ router.post('/register', upload.single('avatar'), authController.register);
 router.post('/login', authController.login);
 
 // Upload avatar route
-router.post('/uploadAvatar', upload.single('avatar'), authController.uploadAvatar);
+// router.post('/uploadAvatar', upload.single('avatar'), authController.uploadAvatar);
 // Logout route
 router.get('/logout', authController.logout);
 

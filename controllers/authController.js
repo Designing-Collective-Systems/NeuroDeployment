@@ -4,15 +4,21 @@ const pgClient = require('../db');
 const saltRounds = 10;
 
 exports.register = async (req, res) => {
-  const { username, password } = req.body;
+  const { username, password,userType} = req.body;
   try {
+    const normalizedUserType = userType.toLowerCase();
+    if (!['participant', 'caregiver'].includes(normalizedUserType)) {
+      return res.status(400).json({ success: false, msg: 'Invalid user type' });
+    }
+
     const hashedPassword = await bcrypt.hash(password, saltRounds);
     const avatarPath = req.file ? `/uploads/${req.file.filename}` : null;
 
     await pgClient.query(
-      'INSERT INTO users (username, password, avatar) VALUES ($1, $2, $3)',
-      [username, hashedPassword, avatarPath]
+      'INSERT INTO users (username, password, role, avatar) VALUES ($1, $2, $3, $4)',
+      [username, hashedPassword, normalizedUserType, avatarPath]
     );
+
 
     res.json({ msg: 'User registered successfully!' });
   } catch (error) {

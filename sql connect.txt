@@ -1,7 +1,7 @@
 psql --host=cd5gks8n4kb20g.cluster-czrs8kj4isg7.us-east-1.rds.amazonaws.com --port=5432 --username=uc4trs5h37bn68 --password --dbname=d1eu3llgsa602
 
 
-CREATE TABLE test_results(id serial, patientid integer, blockno integer, coordx integer, coordy integer, coordt integer, realpointid text, realpointx double precision, realpointy double precision, fakepointid text, fakepointx double precision, fakepointy double precision, speed double precision, pausevalue integer, correctangle double precision, wrongangle double precision, err integer, errorcorrected integer, PRIMARY KEY (id));
+CREATE TABLE test_results(id serial, participantid integer, blockno integer, coordx integer, coordy integer, coordt integer, realpointid text, realpointx double precision, realpointy double precision, fakepointid text, fakepointx double precision, fakepointy double precision, speed double precision, pausevalue integer, correctangle double precision, wrongangle double precision, err integer, errorcorrected integer, PRIMARY KEY (id));
 
 
 
@@ -11,4 +11,4 @@ set transaction read write;
 
 DELETE FROM test_results;
 
-INSERT INTO test_results (patientid, blockno, coordx, coordy, coordt, realpointid, realpointx, realpointy, fakepointid, fakepointx, fakepointy, speed, pausevalue, correctangle, wrongangle, err, errorcorrected) VALUES (-1, 4, 0, 0, 0, 'hello', 0, 0, 'hello', 0, 0, 0, 0, 0, 0, 0, 0);
+INSERT INTO test_results (participantid, blockno, coordx, coordy, coordt, realpointid, realpointx, realpointy, fakepointid, fakepointx, fakepointy, speed, pausevalue, correctangle, wrongangle, err, errorcorrected) VALUES (-1, 4, 0, 0, 0, 'hello', 0, 0, 'hello', 0, 0, 0, 0, 0, 0, 0, 0);
