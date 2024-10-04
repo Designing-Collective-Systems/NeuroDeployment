@@ -25,7 +25,7 @@ const coords = [];
 //let blockno = 1;
 
 const getIDBlock = async function () {
-	const response = await fetch('/calculateResult');
+	const response = await fetch('/api/results/calculateResult');
 	const data = await response.json(); // Correct way to parse JSON
 	return data;
 }
@@ -185,7 +185,7 @@ function endblock() {
 
 	//console.log(data); // TODO log data (debugging, remove later)
 
-	fetch("/submitdata", { // send data to server
+	fetch("/api/results/submitdata", { // send data to server
 		method: "POST",
 		headers: {
 			"Content-Type": "application/json", // as json

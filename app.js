@@ -1,32 +1,41 @@
-// app.js
 const express = require('express');
-const http = require('http');
-const socketIo = require('socket.io');
 const session = require('express-session');
-const bodyParser = require('body-parser');
-const routes = require('./routes'); 
-const { setupSocket } = require('./socket'); 
-const path = require('path'); 
+const pgSession = require('connect-pg-simple')(session);
+const pgClient = require('./db'); 
+const path = require('path');
+const dotenv = require('dotenv');
+
+
+// dotenv.config();
 
 const app = express();
-const server = http.createServer(app);
-const io = socketIo(server);
 
-// middleware
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json());
-app.use(session({ secret: 'secretKey', resave: false, saveUninitialized: true }));
+// Session setup
+app.use(session({
+    store: new pgSession({
+        pool: pgClient,         
+        tableName: 'session'    
+    }),
+    secret: process.env.SESSION_SECRET || 'defaultSecret', 
+    resave: false,            
+    saveUninitialized: false,
+    cookie: { 
+        maxAge: 30 * 24 * 60 * 60 * 1000 
+    }
+}));
 
-// using static file
 app.use(express.static(path.join(__dirname, 'public')));
 
-// set routes
-app.use('/', routes);
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-// set Socket.IO
-setupSocket(io);
+app.use('/api', require('./routes/api'));
 
-const PORT = process.env.PORT || 8080;
-server.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
+app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'test1.html'));
+});
+
+const port = process.env.PORT || 8080;
+app.listen(port, () => {
+    console.log(`Server is running on port ${port}`);
 });
