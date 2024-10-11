@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE-edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="style.css" rel="stylesheet" />
+    <link rel="shortcut icon" href="">
+    <title>Touch Events Example</title>
+    <script src="measures.js" defer> </script>
+    <script src="maxspeed.js" defer> </script>
+</head>
+
+<body>
+
+    <div id="timer">Continue swiping for: <span id="time">00:10</span> minutes!</div>
+
+    <div id="liftModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span class="modal-title">Finger Lifted</span>
+                <span class="modal-close" onclick="closeErrorModal()">&times;</span>
+            </div>
+            <div class="modal-body" id="errorModalBodyContent">
+                <span class="modal-download">Finger lifted, start again</span>
+            </div>
+            <div class="modal-footer">
+                <button onclick="closeErrorModal()">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="resultsModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span class="modal-title">Done!</span>
+                <span class="modal-close" onclick="closeResultsModal()">&times;</span>
+            </div>
+            <div class="modal-body" id="resultsModalBodyContent">
+                <span class="modal-download">You have successfully completed the task</span>
+            </div>
+            <div class="modal-footer">
+                <button onclick="closeResultsModal()">Close</button>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

@@ -20,3 +20,15 @@ CREATE TABLE test_results
     errorcorrected integer,
     PRIMARY KEY (id)
 );
+
+
+
+CREATE TABLE max_speed
+(
+    id serial,
+    pid integer,
+    coordx integer,
+    coordy integer,
+    coordt integer,
+    PRIMARY KEY (id)
+);

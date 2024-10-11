@@ -10,7 +10,7 @@ var pid;
 const port = process.env.PORT || 8080;
 
 const pgClient = new pg.Client({
-	connectionString: process.env.DATABASE_URL || 'postgresql://postgres:admin@localhost:5432/cognition',
+	connectionString: process.env.DATABASE_URL || 'postgresql://postgres:1234@localhost:5432/cognition',
 	ssl: process.env.DATABASE_URL ? { rejectUnauthorized: false } : false
 	//ssl: process.env.DATABASE_URL ? true : false
 
@@ -53,6 +53,10 @@ const server = http.createServer((req, res) => {
 			serveFile('./html/instructions.html', 'text/html; charset=utf-8');
 		} else if (pathname === '/instructions') {
 			serveFile('./html/instructions.html', 'text/html; charset=utf-8');
+		} else if (pathname === '/maxspeedinstruction') {
+			serveFile('./html/maxspeedinstruction.html', 'text/html; charset=utf-8');
+		} else if (pathname === '/maxspeed') {
+			serveFile('./html/maxspeed.html', 'text/html; charset=utf-8');
 		} else if (pathname === '/thanks') {
 			serveFile('./html/thanks.html', 'text/html; charset=utf-8');
 		} else if (pathname === '/test') {
@@ -63,6 +67,8 @@ const server = http.createServer((req, res) => {
 			serveFile('./styles/style.css', 'text/css');
 		} else if (pathname === '/instructions.js') {
 			serveFile('./script/instructions.js', 'application/javascript');
+		} else if (pathname === '/maxspeed.js') {
+			serveFile('./script/maxspeed.js', 'application/javascript');
 		} else if (pathname === '/test.js') {
 			serveFile('./script/test.js', 'application/javascript');
 		} else if (pathname === '/oldtest.js') {
@@ -112,7 +118,36 @@ const server = http.createServer((req, res) => {
 				res.end('500 Internal Server Error');
 			}
 		});
-	} else {
+	} else if (req.method === 'POST' && pathname === '/submitmaxspeeddata') {
+		let body = '';
+
+		req.on('data', chunk => {
+			body += chunk.toString();
+		});
+
+		req.on('end', async () => {
+			try {
+				const data = JSON.parse(body);
+
+
+				// Insert data into the database
+				for (let i = 0; i < data.coordx.length; i++) {
+					await pgClient.query(
+						'INSERT INTO max_speed (pid, coordx, coordy, coordt) VALUES ($1, $2, $3, $4)',
+						[data.pid[i], data.coordx[i], data.coordy[i], data.coordt[i]]
+					);
+				}
+
+				res.writeHead(200, { 'Content-Type': 'text/plain' });
+				res.end('Data successfully submitted');
+			} catch (error) {
+				console.error(error.stack);
+				res.writeHead(500, { 'Content-Type': 'text/plain' });
+				res.end('500 Internal Server Error');
+			}
+		});
+	}
+	else {
 		res.writeHead(404, { 'Content-Type': 'text/plain' });
 		res.end('404 page not found');
 	}

@@ -171,3 +171,7 @@ html {
 li {
     margin: 1rem;
 }
+
+#timer {
+    font-size: xx-large;
+}

@@ -14,8 +14,8 @@ const minAngle = 30;
 let middlex = (window.innerWidth / 2) - circleRadius;
 let middley = (window.innerHeight / 4) + (window.innerHeight / 2) - circleRadius;
 
-const blockLimit = 4;
-const trialLimit = 5 * 2;
+const blockLimit = 8;
+const trialLimit = 8 * 2;
 
 const checkpointStart = document.getElementById('checkpoint1');
 const checkpointFinal = document.getElementById('checkpointE');
@@ -66,8 +66,48 @@ function placePoints(i) {
         [[70, 10], [60, 50]],     // 5
         [[20, 70], [75, 30]],     // E
         [[50, 70], [30, 20]],     // 6
-        [[70, 70], [10, 10]],     // 
-        [[70, 70], [10, 10]],     // 
+        [[10, 10], [60, 30]],     // F
+        [[70, 40], [20, 70]],     // 7
+        [[10, 70], [30, 10]],     // G
+        [[70, 10], [60, 50]],     // 8
+        [[20, 30], [50, 30]],     // H
+        [[60, 10], [10, 50]],     // 9
+        [[10, 70], [30, 10]],     // I
+        [[70, 10], [60, 50]],     // 10
+        [[10, 10], [60, 30]],     // J
+        [[70, 60], [55, 20]],     // 11
+        [[10, 75], [70, 30]],     // K
+        [[20, 30], [50, 30]],     // 12
+        [[70, 40], [20, 70]],     // L
+        [[60, 10], [10, 50]],     // 13
+        [[10, 70], [30, 10]],     // M
+        [[70, 10], [60, 50]],     // 14
+        [[20, 70], [75, 30]],     // N
+        [[50, 70], [30, 20]],     // 15
+        [[10, 10], [60, 30]],     // O
+        [[70, 40], [20, 70]],     // 16
+        [[10, 70], [30, 10]],     // P
+        [[70, 10], [60, 50]],     // 17
+        [[20, 30], [50, 30]],     // Q
+        [[60, 10], [10, 50]],     // 18
+        [[10, 70], [30, 10]],     // R
+        [[70, 10], [60, 50]],     // 19
+        [[10, 10], [60, 30]],     // S
+        [[70, 60], [55, 20]],     // 20
+        [[10, 75], [70, 30]],     // T
+        [[60, 10], [10, 50]],     // 21
+        [[10, 10], [60, 30]],     // U
+        [[70, 60], [55, 20]],     // 22
+        [[10, 75], [70, 30]],     // V
+        [[20, 30], [50, 30]],     // 23
+        [[70, 40], [20, 70]],     // W
+        [[60, 10], [10, 50]],     // 24
+        [[10, 70], [30, 10]],     // X
+        [[70, 10], [60, 50]],     // 25
+        [[10, 10], [60, 30]],     // Y
+        [[70, 60], [55, 20]],     // 26
+        [[10, 75], [70, 30]],     // Z
+        [[60, 10], [10, 50]],     // 27
     ];
 
     // Use the fixed positions based on the iteration, scale them to the current screen size
@@ -157,6 +197,7 @@ function placeChecks() {
 
 getIDBlock().then(data => {
     console.log(data); // Logs the data after the promise is resolved
+    console.log(Date.now());
     pid = data.pid;
     blockno = data.blockno;
 
@@ -269,7 +310,7 @@ function closeErrorModal() {
 
 function closeResultsModal() {
     document.getElementById("resultsModal").style.display = 'none';
-    window.location.replace("/thanks");
+    window.location.replace("/maxspeedinstruction");
 
 }
 
