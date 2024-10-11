@@ -72,17 +72,20 @@ Cognition
 
 1. **Clone the repository:**
 2. **Install the dependencies:**
-   、、、
-   npm install
-   、、、
+
+```
+npm install
+```
+
 3. **Set up the PostgreSQL database:**
 4. **Set up the PostgreSQL database:**
 5. **Run on the server:**
-   、、、
-   npm start
-   、、、
 
-- Open your browser and navigate to http://localhost:8080.
+```
+npm run
+```
+
+Open your browser and navigate to http://localhost:8080.
 
 ## API EndPoint
 
