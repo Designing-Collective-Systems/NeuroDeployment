@@ -43,7 +43,6 @@ body {
     -moz-user-select: none;
     -ms-user-select: none;
     user-select: none;
-    height: 100vh;
 }
 
 .checkpoint {
@@ -175,4 +174,10 @@ li {
 
 #timer {
     font-size: xx-large;
+}
+
+#maxspeedbody {
+    margin: 0;
+    height: 100%;
+    overflow: hidden;
 }
