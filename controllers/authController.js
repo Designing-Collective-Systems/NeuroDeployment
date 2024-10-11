@@ -11,11 +11,9 @@ exports.register = async (req, res) => {
       return res.status(400).json({ success: false, msg: 'Invalid user type' });
     }
 
-    // 加密用户密码
     const hashedPassword = await bcrypt.hash(password, saltRounds);
     const avatarPath = req.file ? `/uploads/${req.file.filename}` : null;
 
-    // 将用户信息存入数据库
     await pgClient.query(
       'INSERT INTO users (username, password, role, avatar) VALUES ($1, $2, $3, $4)',
       [username, hashedPassword, normalizedUserType, avatarPath]

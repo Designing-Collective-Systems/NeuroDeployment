@@ -29,7 +29,6 @@
         const username = document.getElementById("username").value;
         const password = document.getElementById("password").value;
 
-        // 提交登录信息到服务器进行验证
         fetch("/login", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -39,12 +38,11 @@
           .then((data) => {
             if (data.success) {
               if (data.userType === "participant") {
-                // 将 participantUsername 存储到 sessionStorage
+
                 sessionStorage.setItem('participantUsername', username); 
                 console.log('Participant Username stored:', sessionStorage.getItem('participantUsername'));
                 window.location.href = "/participant.html"; 
               } else if (data.userType === "caregiver") {
-                // 将 caregiverUsername 存储到 sessionStorage
                 sessionStorage.setItem('caregiverUsername', username); 
                 console.log('Caregiver Username stored:', sessionStorage.getItem('caregiverUsername'));
                 window.location.href = "/monitor.html"; 
