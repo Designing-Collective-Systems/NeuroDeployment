@@ -23,19 +23,29 @@
     <script>
       const socket = io();
       const participantUsername = sessionStorage.getItem('participantUsername');
-
+      console.log(`Received participantUsername: ${participantUsername}`);
+      // socket.emit('participantJoin', { participantId });
       // Participant requests roomId from server
-      socket.emit('getRoomForParticipant', { participantUsername: participantUsername });
+      // socket.emit('getRoomForParticipant', { participantUsername: participantUsername });
 
-      socket.on("receiveRoomId", (data) => {
-        const roomId = data.roomId;
-        console.log(`Received roomId: ${roomId}`);
+      // socket.on("receiveRoomId", (data) => {
+      //   const roomId = data.roomId;
+      //   console.log('Participant received room ID:', roomId);
 
-        document.getElementById("startButton").addEventListener("click", () => {
-          socket.emit('joinRoom', { roomId: roomId });
-          console.log(`Join the room roomId: ${roomId}`);
-        });
-      });
+      //   document.getElementById("startButton").addEventListener("click", () => {
+      //     socket.emit('joinRoom', { roomId: roomId });
+      //     console.log(`Join the room roomId: ${roomId}`);
+      //   });
+      // });
+    socket.on('roomCreated', (data) => {
+    const { roomId, participantId } = data;
+
+    if (sessionStorage.getItem('participantId') === String(participantId)) {
+        console.log('Room created, joining room:', roomId);
+        socket.emit('joinRoom', { roomId });
+    }
+    });
+
       socket.on("go", () => {
             console.log('Received "go" event, starting test...');
             window.location.href = "/test.html";

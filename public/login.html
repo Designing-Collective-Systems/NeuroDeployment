@@ -29,7 +29,7 @@
         const username = document.getElementById("username").value;
         const password = document.getElementById("password").value;
 
-        fetch("/login", {
+        fetch("/api/login", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ username, password }),
@@ -38,11 +38,12 @@
           .then((data) => {
             if (data.success) {
               if (data.userType === "participant") {
-
+                sessionStorage.setItem('participantId', data.userId);
                 sessionStorage.setItem('participantUsername', username); 
                 console.log('Participant Username stored:', sessionStorage.getItem('participantUsername'));
                 window.location.href = "/participant.html"; 
               } else if (data.userType === "caregiver") {
+                sessionStorage.setItem('caregiverId', data.userId);
                 sessionStorage.setItem('caregiverUsername', username); 
                 console.log('Caregiver Username stored:', sessionStorage.getItem('caregiverUsername'));
                 window.location.href = "/monitor.html"; 

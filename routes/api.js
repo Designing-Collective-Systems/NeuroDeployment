@@ -24,8 +24,8 @@ router.get('/results/calculateResult', resultsController.getLatestResult);
 router.post('/results/submitdata', resultsController.submitResult);
 
 // Auth routes
-// router.post('/auth/register', upload.single('avatar'), authController.register);
-router.post('/auth/login', authController.login);
-router.get('/auth/logout', authController.logout);
+
+router.post('/login', authController.login);
+router.get('/logout', authController.logout);
 
 module.exports = router;

@@ -2,23 +2,30 @@ const pgClient = require('./db');
 
 function setupSocket(io) {
     io.on('connection', (socket) => {
-        console.log('A user connected:', socket.id);
+        // console.log('A user connected:', socket.id);
 
         // Caregiver binds a participant by username
         socket.on('bindparticipantByUsername', async ({ caregiverId, participantUsername }) => {
+            if (!caregiverId) {
+                console.error('Caregiver ID is null or undefined');
+                socket.emit('bindingError', { msg: 'Caregiver ID is missing' });
+                return;
+              }
             try {
                 const result = await pgClient.query('SELECT id FROM users WHERE username = $1', [participantUsername]);
                 if (result.rows.length > 0) {
                     const participantId = result.rows[0].id;
                     const roomId = `room-${participantId}-${caregiverId}`;
                     socket.join(roomId);
-                    console.log(`User joined room ${roomId}`);
+                    console.log(`Caregiver joined room ${roomId}`);
 
                     await pgClient.query(
                         'INSERT INTO pairs (caregiver_id, participant_id, room_id) VALUES ($1, $2, $3) ON CONFLICT (caregiver_id, participant_id) DO NOTHING',
                         [caregiverId, participantId, roomId]
                     );
+                    io.emit('roomCreated', { roomId, participantId }); 
 
+                    // io.to(`participant-${participantId}`).emit('roomCreated', { roomId });
                     socket.emit('bindingSuccess', { roomId });
                 } else {
                     socket.emit('bindingError', { msg: 'Participant username not found' });
@@ -29,26 +36,30 @@ function setupSocket(io) {
             }
         });
 
-        // Participant requests roomId from server
-        socket.on('getRoomForParticipant', async ({ participantUsername }) => {
-            try {
-                const result = await pgClient.query(
-                    'SELECT room_id FROM pairs WHERE participant_id = (SELECT id FROM users WHERE username = $1)',
-                    [participantUsername]
-                );
-                if (result.rows.length > 0) {
-                    const roomId = result.rows[0].room_id;
-                    socket.emit('receiveRoomId', { roomId }); // Send roomId to participant
-                } else {
-                    socket.emit('roomNotFound');
-                }
-            } catch (error) {
-                console.error('Error retrieving roomId:', error);
-                socket.emit('roomNotFound');
-            }
+        // // Participant requests roomId from server
+        // socket.on('getRoomForParticipant', async ({ participantUsername }) => {
+        //     try {
+        //         const result = await pgClient.query(
+        //             'SELECT room_id FROM pairs WHERE participant_id = (SELECT id FROM users WHERE username = $1)',
+        //             [participantUsername]
+        //         );
+        //         if (result.rows.length > 0) {
+        //             const roomId = result.rows[0].room_id;
+        //             socket.emit('receiveRoomId', { roomId }); // Send roomId to participant
+        //         } else {
+        //             socket.emit('roomNotFound');
+        //         }
+        //     } catch (error) {
+        //         console.error('Error retrieving roomId:', error);
+        //         socket.emit('roomNotFound');
+        //     }
+        // });
+        
+        
+        socket.on('joinRoom', ({ roomId }) => {
+            socket.join(roomId);
+            console.log(`Participant joined room: ${roomId}`);
         });
-        
-        
 
         // Go event handler
         socket.on('go', (roomId) => {
@@ -62,11 +73,7 @@ function setupSocket(io) {
         });
         
 
-        // Participant joins room
-        socket.on('joinRoom', ({ roomId }) => {
-            socket.join(roomId);
-            console.log(`Participant joined room: ${roomId}`);
-        });
+        
 
         socket.on('disconnect', () => {
             console.log('User disconnected:', socket.id);

@@ -18,6 +18,14 @@
       const socket = io();
       let caregiverId = sessionStorage.getItem('caregiverId');
       let roomId;
+      window.addEventListener('load', () => {
+      const caregiverId = sessionStorage.getItem('caregiverId');
+      if (!caregiverId) {
+          console.error('No caregiver ID found in sessionStorage');
+      } else {
+          console.log('Caregiver ID from sessionStorage:', caregiverId);
+      }
+      });
 
       document.getElementById("bindparticipant").addEventListener("click", () => {
         const participantUsername = document.getElementById("participantUsername").value;
@@ -25,12 +33,10 @@
           alert("Please enter a participant username.");
           return;
         }
-
         socket.emit("bindparticipantByUsername", {
           caregiverId: caregiverId,
           participantUsername: participantUsername,
         });
-
         console.log("Attempting to bind participant:", participantUsername, "with caregiver:", caregiverId);
       });
 
