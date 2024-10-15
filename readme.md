@@ -30,9 +30,9 @@ Cognition
 │   └── resultsController.js     # Handles result calculations
 │
 ├── database/            # SQL scripts for setting up database tables
-│   ├── measures.sql     # Table definition for measures
+│   ├── measures.sql     # Table definition for measures, test1
 │   ├── users.sql        # Table definition for users
-│   └── query.sql        # Common database queries
+│   └── query.sql        # test results for participants, test2
 │
 ├── public/              # Front-end files served to users
 │   ├── script/
@@ -50,9 +50,6 @@ Cognition
 │   ├── api.js           # API routes
 │   ├── bind.js          # Bind routes and controllers
 │   └── index.js         # Main route handler
-│
-├── views/               # Templates for rendering views (if used)
-│   └── html/
 │
 ├── app.js               # Main Express application
 ├── db.js                # PostgreSQL connection setup

@@ -41,6 +41,7 @@
                 sessionStorage.setItem('participantId', data.userId);
                 sessionStorage.setItem('participantUsername', username); 
                 console.log('Participant Username stored:', sessionStorage.getItem('participantUsername'));
+                
                 window.location.href = "/participant.html"; 
               } else if (data.userType === "caregiver") {
                 sessionStorage.setItem('caregiverId', data.userId);

@@ -25,6 +25,7 @@ const coords = [];
 //let blockno = 1;
 
 const getIDBlock = async function () {
+	
 	const response = await fetch('/api/results/calculateResult');
 	const data = await response.json(); // Correct way to parse JSON
 	return data;
@@ -143,8 +144,12 @@ function placePoints(pair) {
 
 function endblock() {
 	console.log("endblock");
+	if (!participantID) {
+        alert("Participant ID is missing. Please log in.");
+        return;
+    }
 	var data = { // create data object
-		participantid: [],
+		participantid: participantID,
 		blockno: [],
 		coordx: [],
 		coordy: [],
@@ -179,6 +184,7 @@ function endblock() {
 	}
 
 	//console.log(coords);
+	console.log("Collected data:", data);
 
 	data = calculate_measures(coords, data);
 
@@ -202,11 +208,17 @@ function endblock() {
 
 getIDBlock().then(data => {
 	console.log(data); // Logs the data after the promise is resolved
-	participantID = data.participantID;
+	participantID = sessionStorage.getItem('participantId');
+	// participantID = data.participantID;
+	if (!participantID) {
+        alert("Participant ID is missing. Please log in.");
+        window.location.replace("/login.html"); // Redirect to login if no participant ID
+        return;
+    }
 	blockno = data.blockno;
 
 	if (blockno === blockLimit) {
-		participantID = participantID + 1;
+		// participantID = participantID + 1;
 		blockno = 0;
 	}
 

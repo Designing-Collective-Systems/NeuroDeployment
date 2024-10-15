@@ -182,6 +182,7 @@ document.addEventListener("touchend", e => {
 
     // const measureResults = { tapDuration, straightLineDistance, totalDistanceTraveled, totalTime, averageDragSpeed, lastSpeed, peakSpeed, timeToPeakSpeed, lastAcceleration, averageAcceleration, tapAreaSize, shortestPathDistance };
     const measureResults = { 
+        participant_id: sessionStorage.getItem('participantId'),
         tapDuration: tapDuration !== null ? String(tapDuration) : null,  // Convert to string
         straightLineDistance: straightLineDistance !== undefined ? straightLineDistance : 0,  // Ensure this is passed as a number
         totalDistanceTraveled: totalDistanceTraveled !== undefined ? String(totalDistanceTraveled) : "0",

@@ -1,7 +1,8 @@
 CREATE TABLE test_results
 (
     id serial,
-    participantid integer,
+    -- participantid integer,
+    participantid INTEGER REFERENCES users(id) ON DELETE CASCADE,
     blockno integer,
     coordx integer,
     coordy integer,

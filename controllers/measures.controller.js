@@ -104,21 +104,22 @@ const saveMeasures = async (req, res) => {
     console.log('Route hit');
     console.log('Headers:', req.headers);
     console.log('Body:', req.body);
+    const participantId = req.session.userId || req.body.participantId;
+
     
     const {
-        participantId, tapDuration, straightLineDistance, totalDistanceTraveled,
+        tapDuration, straightLineDistance, totalDistanceTraveled,
         totalTime, averageDragSpeed, lastSpeed, peakSpeed, timeToPeakSpeed,
         lastAcceleration, averageAcceleration, tapAreaSize, shortestPathDistance
     } = req.body;
 
-    // Here, we remove the participantId check
     try {
         const result = await pgClient.query(`
             INSERT INTO measures (participant_id, tap_duration, straight_line_distance, total_distance_traveled, total_time, average_drag_speed, last_speed, peak_speed, time_to_peak_speed, last_acceleration, average_acceleration, tap_area_size, shortest_path_distance)
             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
             RETURNING *
         `, [
-            participantId || null, // Allowing null for participantId
+            participantId, 
             tapDuration, straightLineDistance, totalDistanceTraveled,
             totalTime, averageDragSpeed, lastSpeed, peakSpeed, timeToPeakSpeed,
             lastAcceleration, averageAcceleration, tapAreaSize, shortestPathDistance
