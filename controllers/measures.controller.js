@@ -14,7 +14,7 @@ const getMeasures = async (req, res) => {
 }
 
 exports.getMeasuresByParticipantId = async (req, res) => {
-    const participantId = req.params.participantId;
+    const participantId = req.session.userId || req.params.participantId;
     try {
         const result = await pgClient.query(`
             SELECT * FROM measures WHERE participant_id = $1
@@ -46,8 +46,10 @@ const getMeasuresById = async (req, res) => {
 
 // Create a new measure
 const createMeasures = async (req, res) => {
+    const participantId = req.session.userId || req.body.participantId;
+
     const {
-        participantId, tapDuration, straightLineDistance, totalDistanceTraveled,
+        tapDuration, straightLineDistance, totalDistanceTraveled,
         totalTime, averageDragSpeed, lastSpeed, peakSpeed, timeToPeakSpeed,
         lastAcceleration, averageAcceleration, tapAreaSize, shortestPathDistance
     } = req.body;
@@ -104,9 +106,10 @@ const saveMeasures = async (req, res) => {
     console.log('Route hit');
     console.log('Headers:', req.headers);
     console.log('Body:', req.body);
-    const participantId = req.session.userId || req.body.participantId;
 
-    
+    const participantId = req.session.userId || req.body.participantId;
+    // const participantId = req.body.participantId; 
+    console.log("Save measure Participant ID:", participantId);
     const {
         tapDuration, straightLineDistance, totalDistanceTraveled,
         totalTime, averageDragSpeed, lastSpeed, peakSpeed, timeToPeakSpeed,

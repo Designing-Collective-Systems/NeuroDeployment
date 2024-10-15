@@ -180,9 +180,16 @@ document.addEventListener("touchend", e => {
     Tap area: ${tapAreaSize.toFixed(2)} px^2
     Shortest Path Distance: ${shortestPathDistance.toFixed(2)} px `;
 
+    const participantId = sessionStorage.getItem('participantId');
+    if (!participantId) {
+        console.error('Participant ID is missing');
+    } else {
+        console.log('Participant ID:', participantId);
+    }
+
     // const measureResults = { tapDuration, straightLineDistance, totalDistanceTraveled, totalTime, averageDragSpeed, lastSpeed, peakSpeed, timeToPeakSpeed, lastAcceleration, averageAcceleration, tapAreaSize, shortestPathDistance };
     const measureResults = { 
-        participant_id: sessionStorage.getItem('participantId'),
+        participantId,
         tapDuration: tapDuration !== null ? String(tapDuration) : null,  // Convert to string
         straightLineDistance: straightLineDistance !== undefined ? straightLineDistance : 0,  // Ensure this is passed as a number
         totalDistanceTraveled: totalDistanceTraveled !== undefined ? String(totalDistanceTraveled) : "0",

@@ -25,7 +25,6 @@ const coords = [];
 //let blockno = 1;
 
 const getIDBlock = async function () {
-	
 	const response = await fetch('/api/results/calculateResult');
 	const data = await response.json(); // Correct way to parse JSON
 	return data;
@@ -170,7 +169,7 @@ function endblock() {
 	blockno = blockno + 1;
 	console.log(blockno);
 	for (const coord of coords) { // add coords to data object
-		data.participantid.push(participantID);
+		data.participantid = participantID;
 		data.blockno.push(blockno);
 		data.coordx.push(coord[0]);
 		data.coordy.push(coord[1]);
