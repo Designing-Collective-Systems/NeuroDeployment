@@ -4,13 +4,9 @@ const pgSession = require('connect-pg-simple')(session);
 const pgClient = require('./db'); 
 const path = require('path');
 const socketIo = require('socket.io');
-// const dotenv = require('dotenv');
 const http = require('http'); 
 const { setupSocket } = require('./socket'); 
 
-
-
-// dotenv.config();
 
 const app = express();
 const server = http.createServer(app);

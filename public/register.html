@@ -58,7 +58,7 @@
           }
 
           // Submit registration information to the server via HTTP POST
-          fetch("/register", {
+          fetch("/api/register", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ username, password, userType }),
