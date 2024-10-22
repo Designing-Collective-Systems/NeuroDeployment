@@ -1,8 +1,5 @@
 //'use strict';
 
-const pointer = document.createElement("div")
-pointer.classList.add("dot")
-
 let startTime; // beginning of first touch
 
 let pid;
@@ -231,9 +228,11 @@ getIDBlock().then(data => {
             document.getElementById('real').style.display = 'flex';
             document.getElementById('fake').style.display = 'flex';
 
+            const pointer = document.getElementById('pointer')
+            pointer.style.display = 'flex';
             pointer.style.top = `${touch.pageY}px`
             pointer.style.left = `${touch.pageX}px`
-            pointer.id = touch.identifier
+            pointer.id = "pointer"
 
             if (error) {
                 error = false;
@@ -247,7 +246,7 @@ getIDBlock().then(data => {
     document.addEventListener("touchmove", e => {
         const touch = e.changedTouches[0];
 
-        //const pointer = document.getElementById(touch.identifier)
+        const pointer = document.getElementById('pointer')
         pointer.style.top = `${touch.pageY}px`
         pointer.style.left = `${touch.pageX}px`
 
@@ -291,8 +290,8 @@ getIDBlock().then(data => {
         // add point to coords
         const touch = e.changedTouches[0];
 
-        //const pointer = document.getElementById(touch.identifier);
-        pointer.remove();
+        const pointer = document.getElementById('pointer');
+        pointer.style.display = 'none';
 
         //console.log(currentTime());
 
