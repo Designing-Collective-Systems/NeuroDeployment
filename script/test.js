@@ -1,5 +1,8 @@
 //'use strict';
 
+const pointer = document.createElement("div")
+pointer.classList.add("dot")
+
 let startTime; // beginning of first touch
 
 let pid;
@@ -227,6 +230,11 @@ getIDBlock().then(data => {
             placeChecks();
             document.getElementById('real').style.display = 'flex';
             document.getElementById('fake').style.display = 'flex';
+
+            pointer.style.top = `${touch.pageY}px`
+            pointer.style.left = `${touch.pageX}px`
+            pointer.id = touch.identifier
+
             if (error) {
                 error = false;
             }
@@ -238,6 +246,10 @@ getIDBlock().then(data => {
 
     document.addEventListener("touchmove", e => {
         const touch = e.changedTouches[0];
+
+        //const pointer = document.getElementById(touch.identifier)
+        pointer.style.top = `${touch.pageY}px`
+        pointer.style.left = `${touch.pageX}px`
 
         // Advance trialno if on correct point, show error message if not
         if (!error && document.elementsFromPoint(touch.pageX, touch.pageY).includes(document.getElementById('real'))) {
@@ -278,6 +290,9 @@ getIDBlock().then(data => {
     document.addEventListener("touchend", e => {
         // add point to coords
         const touch = e.changedTouches[0];
+
+        //const pointer = document.getElementById(touch.identifier);
+        pointer.remove();
 
         //console.log(currentTime());
 
