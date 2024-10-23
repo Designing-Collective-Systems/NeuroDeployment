@@ -19,6 +19,9 @@ io.on('connection', (socket) => {
       console.log('User disconnected:', socket.id);
     });
   });
+// set request body size
+app.use(express.json({ limit: '50mb' })); 
+app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
 // Session setup
 app.use(session({
