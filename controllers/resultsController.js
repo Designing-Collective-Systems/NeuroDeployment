@@ -26,12 +26,38 @@ exports.getLatestResult = async (req, res) => {
 exports.submitResult = async (req, res) => {
     try {
         const data = req.body; 
+        console.log("Received data:", data);
 
         for (let i = 0; i < data.coordx.length; i++) {
+            console.log("Inserting participant ID:", data.participantid); 
+            // await pgClient.query(
+            //     'INSERT INTO test_results (participantid, blockno, coordx, coordy, coordt, realpointid, realpointx, realpointy, fakepointid, fakepointx, fakepointy, speed, pausevalue, correctangle, wrongangle, err, errorcorrected) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)',
+            //     [data.participantid[i], data.blockno[i], data.coordx[i], data.coordy[i], data.coordt[i], data.realpointid[i], data.realpointx[i], data.realpointy[i], data.fakepointid[i], data.fakepointx[i], data.fakepointy[i], data.speed[i], data.pause[i], data.correctangle[i], data.wrongangle[i], data.error[i], data.errorcorrected[i]]
+            // );
             await pgClient.query(
                 'INSERT INTO test_results (participantid, blockno, coordx, coordy, coordt, realpointid, realpointx, realpointy, fakepointid, fakepointx, fakepointy, speed, pausevalue, correctangle, wrongangle, err, errorcorrected) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)',
-                [data.participantid[i], data.blockno[i], data.coordx[i], data.coordy[i], data.coordt[i], data.realpointid[i], data.realpointx[i], data.realpointy[i], data.fakepointid[i], data.fakepointx[i], data.fakepointy[i], data.speed[i], data.pause[i], data.correctangle[i], data.wrongangle[i], data.error[i], data.errorcorrected[i]]
+                [
+                    data.participantid, 
+                    data.blockno[i],
+                    data.coordx[i],
+                    data.coordy[i],
+                    data.coordt[i],
+                    data.realpointid[i],
+                    data.realpointx[i],
+                    data.realpointy[i],
+                    data.fakepointid[i],
+                    data.fakepointx[i],
+                    data.fakepointy[i],
+                    data.speed[i],
+                    data.pause[i],
+                    data.correctangle[i],
+                    data.wrongangle[i],
+                    data.error[i],
+                    data.errorcorrected[i]
+                ]
             );
+            // console.log("Inserted row:", result.rows[0]); 
+            
         }
 
         res.status(200).json({ msg: 'Data successfully submitted' });
