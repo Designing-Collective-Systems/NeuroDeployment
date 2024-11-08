@@ -53,6 +53,8 @@ const server = http.createServer((req, res) => {
 			serveFile('./html/instructions.html', 'text/html; charset=utf-8');
 		} else if (pathname === '/instructions') {
 			serveFile('./html/instructions.html', 'text/html; charset=utf-8');
+		} else if (pathname === '/instructions2') {
+			serveFile('./html/instructions2.html', 'text/html; charset=utf-8');
 		} else if (pathname === '/maxspeedinstruction') {
 			serveFile('./html/maxspeedinstruction.html', 'text/html; charset=utf-8');
 		} else if (pathname === '/maxspeed') {
@@ -61,6 +63,8 @@ const server = http.createServer((req, res) => {
 			serveFile('./html/thanks.html', 'text/html; charset=utf-8');
 		} else if (pathname === '/test') {
 			serveFile('./html/test.html', 'text/html; charset=utf-8');
+		} else if (pathname === '/test2') {
+			serveFile('./html/test2.html', 'text/html; charset=utf-8');
 		} else if (pathname === '/oldtest') {
 			serveFile('./html/oldtest.html', 'text/html; charset=utf-8');
 		} else if (pathname === '/style.css') {
@@ -71,6 +75,8 @@ const server = http.createServer((req, res) => {
 			serveFile('./script/maxspeed.js', 'application/javascript');
 		} else if (pathname === '/test.js') {
 			serveFile('./script/test.js', 'application/javascript');
+		} else if (pathname === '/test2.js') {
+			serveFile('./script/test2.js', 'application/javascript');
 		} else if (pathname === '/oldtest.js') {
 			serveFile('./script/oldtest.js', 'application/javascript');
 		} else if (pathname === '/measures.js') {
