@@ -177,7 +177,7 @@ function endblock() {
         },
         body: JSON.stringify(data), // body is stringified json
     });
-    if (blockno === blockLimit) {
+    if (blockno >= blockLimit) {
         document.getElementById("resultsModal").style.display = 'block';
     }
     else {
@@ -201,7 +201,7 @@ getIDBlock().then(data => {
     pid = data.pid;
     blockno = data.blockno;
 
-    if (blockno === blockLimit) {
+    if (blockno >= blockLimit) {
         pid = pid + 1;
         blockno = 0;
     }
