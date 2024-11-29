@@ -55,6 +55,10 @@ const server = http.createServer((req, res) => {
 			serveFile('./html/instructions.html', 'text/html; charset=utf-8');
 		} else if (pathname === '/instructions2') {
 			serveFile('./html/instructions2.html', 'text/html; charset=utf-8');
+		} else if (pathname === '/instructions3') {
+			serveFile('./html/instructions3.html', 'text/html; charset=utf-8');
+		} else if (pathname === '/instructions4') {
+			serveFile('./html/instructions4.html', 'text/html; charset=utf-8');
 		} else if (pathname === '/maxspeedinstruction') {
 			serveFile('./html/maxspeedinstruction.html', 'text/html; charset=utf-8');
 		} else if (pathname === '/maxspeed') {
