@@ -14,7 +14,7 @@ const minAngle = 30;
 let middlex = (window.innerWidth / 2) - circleRadius;
 let middley = (window.innerHeight / 4) + (window.innerHeight / 2) - circleRadius;
 
-const blockLimit = 4;
+const blockLimit = 5;
 const trialLimit = 5 * 2;
 
 const checkpointStart = document.getElementById('checkpoint1');
@@ -198,11 +198,12 @@ function placeChecks() {
 getIDBlock().then(data => {
     console.log(data); // Logs the data after the promise is resolved
     console.log(Date.now());
-    pid = data.pid;
+    const storedId = sessionStorage.getItem("participantId");
+    pid = storedId;
     blockno = data.blockno;
 
     if (blockno === blockLimit) {
-        pid = pid + 1;
+        // pid = pid + 1;
         blockno = 0;
     }
 

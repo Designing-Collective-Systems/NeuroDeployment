@@ -49,30 +49,22 @@ const server = http.createServer((req, res) => {
 	};
 
 	if (req.method === 'GET') {
-		if (pathname === '/') {
-			serveFile('./html/instructions.html', 'text/html; charset=utf-8');
+		if (pathname === '/') { // index
+			serveFile('./html/index.html', 'text/html; charset=utf-8');
 		} else if (pathname === '/instructions') {
 			serveFile('./html/instructions.html', 'text/html; charset=utf-8');
 		} else if (pathname === '/thanks') {
 			serveFile('./html/thanks.html', 'text/html; charset=utf-8');
 		} else if (pathname === '/measure-index') {
 			serveFile('./html/measure-index.html', 'text/html; charset=utf-8');
-		} else if (pathname === '/test') {
-			serveFile('./html/test.html', 'text/html; charset=utf-8');
 		} else if (pathname === '/test-original') {
 			serveFile('./html/test-original.html', 'text/html; charset=utf-8');
-		} else if (pathname === '/oldtest') {
-			serveFile('./html/oldtest.html', 'text/html; charset=utf-8');
 		} else if (pathname === '/style.css') {
 			serveFile('./styles/style.css', 'text/css');
 		} else if (pathname === '/instructions.js') {
 			serveFile('./script/instructions.js', 'application/javascript');
-		} else if (pathname === '/test.js') {
-			serveFile('./script/test.js', 'application/javascript');
 		} else if (pathname === '/test-original.js') {
 			serveFile('./script/test-original.js', 'application/javascript');
-		} else if (pathname === '/oldtest.js') {
-			serveFile('./script/oldtest.js', 'application/javascript');
 		} else if (pathname === '/measures.js') {
 			serveFile('./script/measures.js', 'application/javascript');
 		} else if (pathname === '/calculateResult') {

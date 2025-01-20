@@ -7,9 +7,84 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link href="style.css" rel="stylesheet" />
   <title>Motor Performance Study Landing Page</title>
+
+  <!-- css -->
+  <style>
+    /* Center content vertically and horizontally */
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+    }
+
+    .container {
+      text-align: center;
+      padding: 50px;
+      border: 2px solid #ccc;
+      background-color: #fff;
+      border-radius: 10px;
+    }
+
+    input[type="text"] {
+      padding: 10px;
+      font-size: 16px;
+      margin-bottom: 10px;
+      width: 200px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      border: none;
+      border-radius: 5px;
+      background-color: #4CAF50;
+      color: white;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #45a049;
+    }
+  </style>
+
+  <script>
+    // Function to save participant ID to sessionStorage
+    function saveParticipantId() {
+      const participantId = document.getElementById("participantId").value;
+      if (participantId) {
+        sessionStorage.setItem("participantId", participantId);
+        console.log("Participant ID saved!");
+        window.location.href = "/instructions";
+      } else {
+        alert("Please enter a Participant ID.");
+      }
+    }
+
+    // Function to retrieve participant ID from sessionStorage
+    function loadParticipantId() {
+      const storedId = sessionStorage.getItem("participantId");
+      if (storedId) {
+        document.getElementById("participantId").value = storedId;
+        console.log("Participant ID loaded from session: " + storedId);
+      }
+    }
+  </script>
+
 </head>
 
-<body>
+<body onload="loadParticipantId()">
+  <div class="container">
+    <h1>Enter Participant ID</h1>
+    <input type="text" id="participantId" placeholder="Type here..">
+    <br>
+    <button onclick="saveParticipantId()">Submit</button>
+  </div>
 </body>
 
 </html>
