@@ -5,6 +5,7 @@ const pg = require('pg');
 
 var blockno;
 var pid;
+var storedId;
 
 // const hostname = 'https://cognition-a0e89b43ca6a.herokuapp.com/' || 'localhost';
 const port = process.env.PORT || 8080;
@@ -69,10 +70,10 @@ const server = http.createServer((req, res) => {
 			serveFile('./script/measures.js', 'application/javascript');
 		} else if (pathname === '/calculateResult') {
 			async function getData() {
-				const resp = await pgClient.query('SELECT * FROM test_results ORDER BY Id DESC LIMIT 1');
+				const resp = await pgClient.query('SELECT * FROM test_results ORDER BY Id DESC LIMIT 1'); // the pid doesn't exist if they are a new participant.
 				//console.log(resp.rows[0]);
 				const obj = {
-					pid: resp.rows[0].pid,
+					pid: storedId,
 					blockno: resp.rows[0].blockno,
 				};
 				res.end(JSON.stringify(obj));
@@ -110,7 +111,17 @@ const server = http.createServer((req, res) => {
 				res.end('500 Internal Server Error');
 			}
 		});
-	} else {
+	} else if (req.method === 'POST' && req.url === '/save-participant-id') { // Session PID
+		let body = '';
+		req.on('data', chunk => body += chunk);
+		req.on('end', () => {
+			const data = JSON.parse(body);
+			console.log('Participant ID:', data.participantId);
+			storedId = data.participantId;
+			res.end('ID received');
+		});
+	}
+	else {
 		res.writeHead(404, { 'Content-Type': 'text/plain' });
 		res.end('404 page not found');
 	}

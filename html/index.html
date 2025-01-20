@@ -60,6 +60,14 @@
       if (participantId) {
         sessionStorage.setItem("participantId", participantId);
         console.log("Participant ID saved!");
+        fetch('/save-participant-id', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ participantId: participantId })
+        })
+          .catch((error) => console.error('Error:', error));
         window.location.href = "/instructions";
       } else {
         alert("Please enter a Participant ID.");
