@@ -55,8 +55,12 @@ const server = http.createServer((req, res) => {
 			serveFile('./html/instructions.html', 'text/html; charset=utf-8');
 		} else if (pathname === '/thanks') {
 			serveFile('./html/thanks.html', 'text/html; charset=utf-8');
+		} else if (pathname === '/measure-index') {
+			serveFile('./html/measure-index.html', 'text/html; charset=utf-8');
 		} else if (pathname === '/test') {
 			serveFile('./html/test.html', 'text/html; charset=utf-8');
+		} else if (pathname === '/test-original') {
+			serveFile('./html/test-original.html', 'text/html; charset=utf-8');
 		} else if (pathname === '/oldtest') {
 			serveFile('./html/oldtest.html', 'text/html; charset=utf-8');
 		} else if (pathname === '/style.css') {
@@ -65,6 +69,8 @@ const server = http.createServer((req, res) => {
 			serveFile('./script/instructions.js', 'application/javascript');
 		} else if (pathname === '/test.js') {
 			serveFile('./script/test.js', 'application/javascript');
+		} else if (pathname === '/test-original.js') {
+			serveFile('./script/test-original.js', 'application/javascript');
 		} else if (pathname === '/oldtest.js') {
 			serveFile('./script/oldtest.js', 'application/javascript');
 		} else if (pathname === '/measures.js') {
@@ -119,7 +125,7 @@ const server = http.createServer((req, res) => {
 });
 
 server.listen(port, () => {
-	//console.log(`Server running at http://${hostname}:${port}/`);
+	// console.log(`Server running at http://${hostname}:${port}/`);
 });
 
 

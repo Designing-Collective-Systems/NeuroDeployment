@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <!-- Prevent zooming to maintain consistent CSS pixels -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Finger Diameter Measurement</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f4f4f4;
+            position: relative;
+            user-select: none;
+            overflow: hidden;
+        }
+
+        #output {
+            font-size: 24px;
+            color: #333;
+            text-align: center;
+            user-select: none;
+            padding: 20px;
+            background-color: #fff;
+            border: 2px solid #333;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            z-index: 2;
+            max-width: 90%;
+        }
+
+        /* Exit link */
+        #exit-link {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            text-decoration: none;
+            font-size: 18px;
+            color: #007bff;
+            font-weight: bold;
+            user-select: none;
+            z-index: 3;
+        }
+
+        #exit-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Exit Link -->
+    <a href="/" id="exit-link">Exit</a>
+
+    <!-- Output area for finger measurement -->
+    <div id="output">Place your finger on the screen</div>
+
+    <script>
+        (function () {
+            const output = document.getElementById('output');
+
+            // Define device specifications
+            const devices = [
+                {
+                    name: 'phone',
+                    innerWidth: 384,
+                    innerHeight: 726,
+                    ppi: 500, // Confirmed PPI for the phone
+                    dpr: 3.5 // Confirmed DPR for the phone
+                },
+                {
+                    name: 'iPad',
+                    innerWidth: 820,
+                    innerHeight: 1061,
+                    ppi: 264, // Confirmed PPI for the iPad
+                    dpr: 2 // Confirmed DPR for the iPad
+                }
+            ];
+
+            // Function to detect device based on innerWidth and innerHeight with tolerance
+            function detectDevice() {
+                const currentWidth = window.innerWidth;
+                const currentHeight = window.innerHeight;
+                const tolerance = 20; // pixels
+
+                for (let device of devices) {
+                    if (
+                        Math.abs(currentWidth - device.innerWidth) <= tolerance &&
+                        Math.abs(currentHeight - device.innerHeight) <= tolerance
+                    ) {
+                        return device;
+                    }
+                }
+                // If no match found within tolerance, assume it's a phone or iPad based on size
+                // Since device not recognized feature is removed, make a best guess
+                // Here, if width < 600px, assume phone; else, assume iPad
+                if (currentWidth < 600) {
+                    return devices[0]; // phone
+                } else {
+                    return devices[1]; // iPad
+                }
+            }
+
+            // Initialize device
+            let currentDevice = detectDevice();
+
+            console.log(`Device detected: ${currentDevice.name}`);
+            console.log(`Inner Width: ${window.innerWidth}px, Inner Height: ${window.innerHeight}px`);
+            console.log(`PPI: ${currentDevice.ppi}, DPR: ${currentDevice.dpr}`);
+
+            // Function to calculate finger diameter
+            function calculateDiameter(touch) {
+                // Ensure touch.radiusX and touch.radiusY are available
+                if (typeof touch.radiusX !== 'number' || typeof touch.radiusY !== 'number') {
+                    output.textContent = 'Touch radius data not available on this device.';
+                    console.warn('Touch radius data not available.');
+                    return;
+                }
+
+                // Calculate average diameter in CSS pixels
+                const diameterX = touch.radiusX * 2; // Diameter in CSS pixels (X direction)
+                const diameterY = touch.radiusY * 2; // Diameter in CSS pixels (Y direction)
+                const avgDiameterCSSPixels = (diameterX + diameterY) / 2;
+
+                // Convert CSS pixels to physical pixels using DPR
+                const devicePixelRatio = window.devicePixelRatio || 1;
+                const avgDiameterPhysicalPixels = avgDiameterCSSPixels * currentDevice.dpr;
+
+                // Convert physical pixels to inches using PPI
+                const diameterInInches = avgDiameterPhysicalPixels / currentDevice.ppi;
+
+                // Convert inches to millimeters
+                const diameterInMillimeters = diameterInInches * 25.4;
+
+                const angle = touch.rotationAngle;
+
+                // Display the result
+                // output.textContent = `Finger diameter: ${avgDiameterCSSPixels.toFixed(2)}px | ${diameterInMillimeters.toFixed(2)} mm`;
+                output.textContent = `${angle} -- radiusX = ${touch.radiusX.toFixed(4)}px -- radiusY = ${touch.radiusY.toFixed(4)}px -- Finger diameter: ${avgDiameterCSSPixels.toFixed(2)}px | ${diameterInMillimeters.toFixed(2)} mm | ${diameterInInches.toFixed(2)} in`;
+
+                // Log details for debugging
+                console.log(`CSS Pixels: ${avgDiameterCSSPixels.toFixed(2)}px`);
+                console.log(`Physical Pixels: ${avgDiameterPhysicalPixels.toFixed(2)}px`);
+                console.log(`Diameter in inches: ${diameterInInches.toFixed(4)}"`);
+                console.log(`Diameter in millimeters: ${diameterInMillimeters.toFixed(2)}mm`);
+            }
+
+            // Event listener for touchstart
+            function handleTouchStart(event) {
+                if (event.touches.length > 0) {
+                    const touch = event.touches[0];
+                    calculateDiameter(touch);
+                }
+            }
+
+            // Event listener for touchend
+            function handleTouchEnd() {
+                output.textContent = 'Place your finger on the screen';
+            }
+
+            // Prevent default touchmove behavior to avoid scrolling
+            function handleTouchMove(event) {
+                event.preventDefault();
+            }
+
+            // Attach event listeners
+            document.addEventListener('touchstart', handleTouchStart, { passive: false });
+            document.addEventListener('touchend', handleTouchEnd);
+            document.addEventListener('touchmove', handleTouchMove, { passive: false });
+
+            // Handle window resize (e.g., orientation change)
+            window.addEventListener('resize', () => {
+                // Re-detect device on resize
+                currentDevice = detectDevice();
+                console.log(`Device re-detected: ${currentDevice.name}`);
+                console.log(`Inner Width: ${window.innerWidth}px, Inner Height: ${window.innerHeight}px`);
+                console.log(`PPI: ${currentDevice.ppi}, DPR: ${currentDevice.dpr}`);
+                output.textContent = 'Place your finger on the screen';
+            });
+        })();
+    </script>
+</body>
+
+</html>
