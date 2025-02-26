@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cognition Project</title>
+</head>
+<body>
+
+    <h1>Cognition Project</h1>
+    <h2>Overview</h2>
+    <hr/>
+    <p>
+        The Cognition Project is a web-based application designed to track and analyze motor performance through touch interactions.
+        It features user authentication, role-based access (participants and caregivers), and a RESTful API for handling measurements and results.
+        The system is built with Node.js, Express, and PostgreSQL.
+    </p>
+
+    <h3>Features</h3>
+    <ul>
+        <li><strong>Motor Performance Metrics:</strong> Tracks drag speed, distance, acceleration, and tap duration.</li>
+        <li><strong>User Roles:</strong> Participants and caregivers with specific permissions.</li>
+        <li><strong>API Integration:</strong> RESTful API for managing users, measurements, and results.</li>
+        <li><strong>Database Storage:</strong> Uses PostgreSQL for data persistence.</li>
+    </ul>
+
+    <h3>Project Structure</h3>
+    <pre>
+Cognition
+│
+├── config/              # Configuration files
+│   └── uploadConfig.js  # Configuration for file uploads
+│
+├── controllers/         # Controllers handling logic for routes
+│   ├── authController.js        # Handles user login and registration
+│   ├── fileController.js        # Handles file uploads
+│   ├── measures.controller.js   # Handles measures creation and retrieval
+│   └── resultsController.js     # Handles result calculations
+│
+├── database/            # SQL scripts for setting up database tables
+│   ├── measures.sql     # Table definition for measures
+│   ├── users.sql        # Table definition for users
+│   └── query.sql        # Test results for participants
+│
+├── public/              # Front-end files served to users
+│   ├── script/
+│   │   ├── deviation.js         # Script for deviation calculations
+│   │   ├── measures.js          # Script for managing measures
+│   │   ├── test1.js             # Additional test logic
+│   │   └── test2.js             # Additional test logic
+│   ├── styles/
+│   │   ├── style1.css           # General styles
+│   │   └── style2.css           # Additional styles
+│   ├── uploads/                 # Directory for file uploads
+│   └── *.html                   # HTML files (index, login, participant, etc.)
+│
+├── routes/              # Route definitions
+│   ├── api.js           # API routes
+│   ├── bind.js          # Bind routes and controllers
+│   └── index.js         # Main route handler
+│
+├── app.js               # Main Express application
+├── db.js                # PostgreSQL connection setup
+├── package.json         # Project dependencies and scripts
+└── socket.js            # WebSocket integration (if needed)
+    </pre>
+
+    <h3>How to Run</h3>
+    <ol>
+        <li>Install <strong>Node.js</strong> and <strong>PostgreSQL</strong>.</li>
+        <li>Clone the repository.</li>
+        <li>Install dependencies: <code>npm install</code></li>
+        <li>Set up the PostgreSQL database.</li>
+        <li>Start the server: <code>npm run</code></li>
+        <li>Open <code>http://localhost:8080</code> in a browser.</li>
+    </ol>
+
+    <h3>API Endpoints</h3>
+    
+    <h4>Authentication</h4>
+    <ul>
+        <li><code>POST /auth/login</code></li>
+        <li><code>POST /auth/logout</code></li>
+    </ul>
+
+    <h4>Measures</h4>
+    <ul>
+        <li><code>POST /measures/save</code></li>
+        <li><code>GET /measures/:id</code></li>
+        <li><code>PUT /measures/:id</code></li>
+        <li><code>DELETE /measures/:id</code></li>
+    </ul>
+
+    <h4>Results</h4>
+    <ul>
+        <li><code>GET /results/calculateResult</code></li>
+        <li><code>POST /results/submitdata</code></li>
+    </ul>
+
+</body>
+</html>
