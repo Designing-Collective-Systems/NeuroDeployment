@@ -1,101 +1,174 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cognition Project</title>
+  <meta charset="utf-8" />
+  <title>Attractive Paper Prototype Outline for Neuro Project Homepage</title>
+  <style>
+    /* Reset and basic styles */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(120deg, #fdfbfb 0%, #ebedee 100%);
+      color: #333;
+      padding: 20px;
+      line-height: 1.6;
+    }
+    header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    header h1 {
+      font-size: 2em;
+      margin-bottom: 10px;
+      color: #444;
+    }
+    header p {
+      font-size: 1em;
+      color: #666;
+    }
+    .section {
+      background: #fff;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    h2 {
+      font-size: 1.5em;
+      margin-bottom: 10px;
+      color: #2c3e50;
+      border-bottom: 2px solid #e0e0e0;
+      padding-bottom: 8px;
+    }
+    .placeholder {
+      display: block;
+      border: 2px dashed #bbb;
+      padding: 15px;
+      margin: 15px 0;
+      border-radius: 4px;
+      background-color: #f9f9f9;
+      text-align: center;
+      font-weight: bold;
+      color: #777;
+    }
+    .placeholder.small { width: 30%; }
+    .placeholder.medium { width: 50%; }
+    .placeholder.large { width: 100%; }
+    .notes {
+      color: #555;
+      font-size: 0.9em;
+      background-color: #f1f1f1;
+      padding: 10px;
+      border-left: 4px solid #ccc;
+      margin-top: 10px;
+      border-radius: 4px;
+    }
+    hr {
+      margin: 40px 0;
+      border: none;
+      border-top: 1px solid #ddd;
+    }
+  </style>
 </head>
 <body>
 
-    <h1>Cognition Project</h1>
-    <h2>Overview</h2>
-    <hr/>
-    <p>
-        The Cognition Project is a web-based application designed to track and analyze motor performance through touch interactions.
-        It features user authentication, role-based access (participants and caregivers), and a RESTful API for handling measurements and results.
-        The system is built with Node.js, Express, and PostgreSQL.
+  <header>
+    <h1>Neuro Project Homepage - Paper Prototype Outline</h1>
+    <p>A sketch-based design layout to outline the key elements of the homepage.</p>
+  </header>
+
+  <!-- HEADER / NAVIGATION -->
+  <div class="section">
+    <h2>Header &amp; Navigation</h2>
+    <div class="placeholder small">Project Logo</div>
+    <div class="placeholder small">Menu Links</div>
+    <p class="notes">
+      Draw a simple top bar with the project logo on the left and navigation links (e.g., Home, About, Docs) on the right.
     </p>
+  </div>
+  
+  <!-- HERO / INTRO SECTION -->
+  <div class="section">
+    <h2>Hero or Intro Section</h2>
+    <div class="placeholder large">Hero Image / Background</div>
+    <div class="placeholder">Main Headline (Project Title)</div>
+    <div class="placeholder">Sub-Headline / Intro Text</div>
+    <div class="placeholder small">Call-to-Action Button</div>
+    <p class="notes">
+      Sketch a large banner area with bold text for the title, a short subtitle, and a prominent CTA button (e.g., "Get Started").
+    </p>
+  </div>
 
-    <h3>Features</h3>
-    <ul>
-        <li><strong>Motor Performance Metrics:</strong> Tracks drag speed, distance, acceleration, and tap duration.</li>
-        <li><strong>User Roles:</strong> Participants and caregivers with specific permissions.</li>
-        <li><strong>API Integration:</strong> RESTful API for managing users, measurements, and results.</li>
-        <li><strong>Database Storage:</strong> Uses PostgreSQL for data persistence.</li>
-    </ul>
+  <!-- ABOUT / OVERVIEW SECTION -->
+  <div class="section">
+    <h2>About / Overview</h2>
+    <div class="placeholder medium">Overview Text Block</div>
+    <div class="placeholder small">Illustration / Icon</div>
+    <p class="notes">
+      Represent what the Neuro Project is about with blocks for text and a small illustration or icon.
+    </p>
+  </div>
 
-    <h3>Project Structure</h3>
-    <pre>
-Cognition
-│
-├── config/              # Configuration files
-│   └── uploadConfig.js  # Configuration for file uploads
-│
-├── controllers/         # Controllers handling logic for routes
-│   ├── authController.js        # Handles user login and registration
-│   ├── fileController.js        # Handles file uploads
-│   ├── measures.controller.js   # Handles measures creation and retrieval
-│   └── resultsController.js     # Handles result calculations
-│
-├── database/            # SQL scripts for setting up database tables
-│   ├── measures.sql     # Table definition for measures
-│   ├── users.sql        # Table definition for users
-│   └── query.sql        # Test results for participants
-│
-├── public/              # Front-end files served to users
-│   ├── script/
-│   │   ├── deviation.js         # Script for deviation calculations
-│   │   ├── measures.js          # Script for managing measures
-│   │   ├── test1.js             # Additional test logic
-│   │   └── test2.js             # Additional test logic
-│   ├── styles/
-│   │   ├── style1.css           # General styles
-│   │   └── style2.css           # Additional styles
-│   ├── uploads/                 # Directory for file uploads
-│   └── *.html                   # HTML files (index, login, participant, etc.)
-│
-├── routes/              # Route definitions
-│   ├── api.js           # API routes
-│   ├── bind.js          # Bind routes and controllers
-│   └── index.js         # Main route handler
-│
-├── app.js               # Main Express application
-├── db.js                # PostgreSQL connection setup
-├── package.json         # Project dependencies and scripts
-└── socket.js            # WebSocket integration (if needed)
-    </pre>
+  <!-- VIDEO / DEMO SECTION -->
+  <div class="section">
+    <h2>Video / Demo</h2>
+    <div class="placeholder large">Embedded Video Preview</div>
+    <p class="notes">
+      Allocate space for a video demo by drawing a rectangle that mimics a video player with a "Play" button.
+    </p>
+  </div>
 
-    <h3>How to Run</h3>
-    <ol>
-        <li>Install <strong>Node.js</strong> and <strong>PostgreSQL</strong>.</li>
-        <li>Clone the repository.</li>
-        <li>Install dependencies: <code>npm install</code></li>
-        <li>Set up the PostgreSQL database.</li>
-        <li>Start the server: <code>npm run</code></li>
-        <li>Open <code>http://localhost:8080</code> in a browser.</li>
-    </ol>
-
-    <h3>API Endpoints</h3>
+  <!-- FEATURES / HIGHLIGHTS SECTION -->
+  <div class="section">
+    <h2>Features / Highlights</h2>
+    <div class="placeholder small">Feature Icon 1</div>
+    <div class="placeholder small">Feature Description 1</div>
     
-    <h4>Authentication</h4>
-    <ul>
-        <li><code>POST /auth/login</code></li>
-        <li><code>POST /auth/logout</code></li>
-    </ul>
+    <div class="placeholder small">Feature Icon 2</div>
+    <div class="placeholder small">Feature Description 2</div>
+    
+    <div class="placeholder small">Feature Icon 3</div>
+    <div class="placeholder small">Feature Description 3</div>
+    
+    <p class="notes">
+      Sketch multiple feature blocks, each with an icon and a brief description.
+    </p>
+  </div>
 
-    <h4>Measures</h4>
-    <ul>
-        <li><code>POST /measures/save</code></li>
-        <li><code>GET /measures/:id</code></li>
-        <li><code>PUT /measures/:id</code></li>
-        <li><code>DELETE /measures/:id</code></li>
-    </ul>
+  <!-- TEAM / CONTRIBUTORS SECTION -->
+  <div class="section">
+    <h2>Team / Contributors</h2>
+    <div class="placeholder small">Team Member 1 (Image &amp; Name)</div>
+    <div class="placeholder small">Team Member 2 (Image &amp; Name)</div>
+    <div class="placeholder small">Team Member 3 (Image &amp; Name)</div>
+    <p class="notes">
+      Draw small avatars or circles to represent team members along with labels for names and roles.
+    </p>
+  </div>
 
-    <h4>Results</h4>
-    <ul>
-        <li><code>GET /results/calculateResult</code></li>
-        <li><code>POST /results/submitdata</code></li>
-    </ul>
+  <!-- FOOTER -->
+  <div class="section">
+    <h2>Footer</h2>
+    <div class="placeholder medium">Footer Links / Contact Info / Social Icons</div>
+    <p class="notes">
+      Create a footer section with placeholders for contact details and social media icons.
+    </p>
+  </div>
+
+  <hr />
+
+  <p class="notes">
+    <strong>Instructions:</strong><br />
+    1. For each section above, create a quick sketch on paper representing the described elements.<br />
+    2. Label placeholders (e.g., "Image", "Video", "Text") rather than using actual content.<br />
+    3. Indicate interactions like scrolling or clicking on different navigation elements using additional sketches if needed.<br />
+    4. Focus on layout and structure rather than detailed design.
+  </p>
 
 </body>
 </html>
