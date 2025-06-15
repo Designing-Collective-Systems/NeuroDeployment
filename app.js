@@ -49,6 +49,7 @@ const server = http.createServer((req, res) => {
 	};
 
 	if (req.method === 'GET') {
+		console.log(pathname);
 		if (pathname === '/') {
 			serveFile('./html/instructions.html', 'text/html; charset=utf-8');
 		} else if (pathname === '/instructions') {
@@ -78,10 +79,13 @@ const server = http.createServer((req, res) => {
 		} else if (pathname === '/maxspeed.js') {
 			serveFile('./script/maxspeed.js', 'application/javascript');
 		} else if (pathname === '/test.js') {
+			console.log(1);
 			serveFile('./script/test.js', 'application/javascript');
 		} else if (pathname === '/test2.js') {
+			console.log(2);
 			serveFile('./script/test2.js', 'application/javascript');
 		} else if (pathname === '/oldtest.js') {
+			console.log(3);
 			serveFile('./script/oldtest.js', 'application/javascript');
 		} else if (pathname === '/measures.js') {
 			serveFile('./script/measures.js', 'application/javascript');

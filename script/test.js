@@ -14,6 +14,7 @@ const minAngle = 30;
 let middlex = (window.innerWidth / 2) - circleRadius;
 let middley = (window.innerHeight / 4) + (window.innerHeight / 2) - circleRadius;
 
+// or 4 for trail making
 const blockLimit = 8;
 const trialLimit = 5 * 2;
 
@@ -30,8 +31,10 @@ const coords = [];
 //let blockno = 1;
 
 const getIDBlock = async function () {
+    console.log("here");
     const response = await fetch('/calculateResult');
     const data = await response.json(); // Correct way to parse JSON
+    console.log(data);
     return data;
 }
 
@@ -43,17 +46,7 @@ function currentTime() {
     return Date.now() - startTime;
 }
 
-
-function placePoints(i) {
-    let x1 = 0; // Real node x
-    let y1 = 0; // Real node y
-    let x2 = 0; // Fake node x
-    let y2 = 0; // Fake node y
-
-    // Get window dimensions
-    const screenWidth = window.innerWidth;
-    const screenHeight = window.innerHeight;
-
+function placeFixedPoints(i, screenWidth, screenHeight, x1, y1, x2, y2) {
     // Define fixed relative positions for real and fake nodes in opposite corners/sides
     const fixedRelativePositions = [
         [[10, 10], [60, 30]],     // Real: A, Fake: 2
@@ -125,6 +118,103 @@ function placePoints(i) {
     }
 }
 
+function placeVariedPoints(i, screenWidth, screenHeight, x1, y1, x2, y2) {
+    if (i == 0) {
+        x1 = Math.random() * (screenWidth / 2 - 100);
+        y1 = Math.random() * (screenHeight / 2 - 100);
+        x2 = (screenWidth / 2) + (Math.random() * (screenWidth / 2 - 100));
+        y2 = (Math.random() * (screenHeight / 2 - 100));
+
+        if (Math.abs(Math.atan2(middley - y1, middlex - x1) * 180 / Math.PI - Math.atan2(middley - y2, middlex - x2) * 180 / Math.PI) < minAngle) {
+            placeVariedPoints(i, screenWidth, screenHeight, x1, y1, x2, y2)
+        }
+        else {
+            checkpointPairsCoords.push([[x1, y1], [x2, y2]]);
+        }
+    }
+    else {
+        if (checkpointPairsCoords[i - 1][0][0] < (screenWidth / 2) && checkpointPairsCoords[i - 1][0][1] < (screenHeight / 2)) {
+            x1 = Math.random() * (screenWidth - 100);
+            if (x1 < (screenWidth / 2)) {
+                y1 = (screenHeight / 2) + (Math.random() * (screenHeight / 2 - 100));
+                x2 = (screenWidth / 2) + (Math.random() * (screenWidth / 2 - 100));
+                y2 = (Math.random() * (screenHeight - 100));
+            }
+            else {
+                y1 = (Math.random() * (screenHeight - 100));
+                x2 = (Math.random() * (screenWidth / 2 - 100));
+                y2 = (screenHeight / 2) + (Math.random() * (screenHeight / 2 - 100));
+            }
+        }
+
+        if (checkpointPairsCoords[i - 1][0][0] > (screenWidth / 2) && checkpointPairsCoords[i - 1][0][1] < (screenHeight / 2)) {
+            x1 = Math.random() * (screenWidth - 100);
+            if (x1 > (screenWidth / 2)) {
+                y1 = (screenHeight / 2) + (Math.random() * (screenHeight / 2 - 100));
+                x2 = (Math.random() * (screenWidth / 2 - 100));
+                y2 = (Math.random() * (screenHeight - 100));
+            }
+            else {
+                y1 = (Math.random() * (screenHeight - 100));
+                x2 = (screenWidth / 2) + (Math.random() * (screenWidth / 2 - 100));
+                y2 = (screenHeight / 2) + (Math.random() * (screenHeight / 2 - 100));
+            }
+        }
+
+        if (checkpointPairsCoords[i - 1][0][0] < (screenWidth / 2) && checkpointPairsCoords[i - 1][0][1] > (screenHeight / 2)) {
+            x1 = Math.random() * (screenWidth - 100);
+            if (x1 < (screenWidth / 2)) {
+                y1 = (Math.random() * (screenHeight / 2 - 100));
+                x2 = (screenWidth / 2) + (Math.random() * (screenWidth / 2 - 100));
+                y2 = (Math.random() * (screenHeight - 100));
+            }
+            else {
+                y1 = (Math.random() * (screenHeight - 100));
+                x2 = (Math.random() * (screenWidth / 2 - 100));
+                y2 = (Math.random() * (screenHeight / 2 - 100));
+            }
+        }
+
+        if (checkpointPairsCoords[i - 1][0][0] > (screenWidth / 2) && checkpointPairsCoords[i - 1][0][1] > (screenHeight / 2)) {
+            x1 = Math.random() * (screenWidth - 100);
+            if (x1 > (screenWidth / 2)) {
+                y1 = (Math.random() * (screenHeight / 2 - 100));
+                x2 = (Math.random() * (screenWidth / 2 - 100));
+                y2 = (Math.random() * (screenHeight - 100));
+            }
+            else {
+                y1 = (Math.random() * (screenHeight - 100));
+                x2 = (screenWidth / 2) + (Math.random() * (screenWidth / 2 - 100));
+                y2 = (Math.random() * (screenHeight / 2 - 100));
+            }
+        }
+        if (Math.abs(Math.atan2(checkpointPairsCoords[i - 1][0][1] - y1, checkpointPairsCoords[i - 1][0][0] - x1) * 180 / Math.PI - Math.atan2(checkpointPairsCoords[i - 1][0][1] - y2, checkpointPairsCoords[i - 1][0][0] - x2) * 180 / Math.PI) < minAngle) {
+            placeVariedPoints(i, screenWidth, screenHeight, x1, y1, x2, y2)
+        }
+        else {
+            checkpointPairsCoords.push([[x1, y1], [x2, y2]]);
+        }
+    }
+}
+
+
+function placePoints(i) {
+    let x1 = 0; // Real node x
+    let y1 = 0; // Real node y
+    let x2 = 0; // Fake node x
+    let y2 = 0; // Fake node y
+
+    // read from db instead
+    const isFixed = true;
+
+    if (isFixed) {
+        placeFixedPoints(i, window.innerWidth, window.innerHeight, x1, y1, x2, y2);
+    }
+    else {
+        placeVariedPoints(i, window.innerWidth, window.innerHeight, x1, y1, x2, y2);
+    }
+}
+
 
 function endblock() {
     console.log("endblock");
@@ -148,6 +238,7 @@ function endblock() {
         errorcorrected: [],
     };
     blockno = blockno + 1;
+    console.log("blockno: " + blockno);
     console.log(blockno);
     for (const coord of coords) { // add coords to data object
         data.pid.push(pid);
@@ -200,9 +291,11 @@ getIDBlock().then(data => {
     console.log(Date.now());
     pid = data.pid;
     blockno = data.blockno;
+    console.log("pid " + pid + " blockno " + blockno);
 
     if (blockno >= blockLimit) {
         pid = pid + 1;
+        console.log("incrementing pid to " + pid + " , blockno set back to 0");
         blockno = 0;
     }
 
