@@ -1,6 +1,7 @@
 -- Table: public.test_results
 
 -- DROP TABLE IF EXISTS public.test_results;
+CREATE SEQUENCE IF NOT EXISTS test_results_id_seq;
 
 CREATE TABLE IF NOT EXISTS public.test_results
 (
