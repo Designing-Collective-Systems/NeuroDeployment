@@ -100,6 +100,21 @@ const server = http.createServer((req, res) => {
 				res.end(JSON.stringify(obj));
 			}
 			getData();
+		} else if (pathname === '/getParameters') {
+			async function getParameters() {
+				const resp = await pgClient.query('SELECT * FROM parameters ORDER BY id ASC LIMIT 1');
+				const row = resp.rows[0];
+
+				const obj = {
+					fixed_or_rand: row.fixed_or_rand,
+					num_blocks: row.num_blocks,
+					num_trials: row.num_trials,
+					node_radius: row.node_radius,
+					min_angle: row.min_angle
+				};
+				res.end(JSON.stringify(obj));
+			}
+			getParameters();
 		} else {
 			res.writeHead(404, { 'Content-Type': 'text/plain' });
 			res.end('404 page not found');

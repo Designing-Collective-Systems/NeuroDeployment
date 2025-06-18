@@ -3,20 +3,26 @@
 let startTime; // beginning of first touch
 
 let pid;
+let blockLimit;
+let trialLimit;
+let nodeRadius;
+let minAngle;
+let isFixed;
+
 let blockno;
 let trialno = -1;
 
 let start = 0;
 
-const circleRadius = 40;
-const minAngle = 30;
+// const circleRadius = 40;
+// const minAngle = 30;
 
-let middlex = (window.innerWidth / 2) - circleRadius;
-let middley = (window.innerHeight / 4) + (window.innerHeight / 2) - circleRadius;
+let middlex;
+let middley;
 
 // or 4 for trail making
-const blockLimit = 8;
-const trialLimit = 5 * 2;
+// const blockLimit = 8;
+// const trialLimit = 5 * 2;
 
 const checkpointStart = document.getElementById('checkpoint1');
 const checkpointFinal = document.getElementById('checkpointE');
@@ -31,12 +37,18 @@ const coords = [];
 //let blockno = 1;
 
 const getIDBlock = async function () {
-    console.log("here");
     const response = await fetch('/calculateResult');
     const data = await response.json(); // Correct way to parse JSON
     console.log(data);
     return data;
 }
+
+const getParameters = async function () {
+    const response = await fetch('/getParameters');
+    const data = await response.json();
+    console.log(data);
+    return data;
+};
 
 //console.log(pid);
 //console.log(blockno);
@@ -131,6 +143,7 @@ function placeVariedPoints(i, screenWidth, screenHeight, x1, y1, x2, y2) {
         else {
             checkpointPairsCoords.push([[x1, y1], [x2, y2]]);
         }
+
     }
     else {
         if (checkpointPairsCoords[i - 1][0][0] < (screenWidth / 2) && checkpointPairsCoords[i - 1][0][1] < (screenHeight / 2)) {
@@ -203,9 +216,6 @@ function placePoints(i) {
     let y1 = 0; // Real node y
     let x2 = 0; // Fake node x
     let y2 = 0; // Fake node y
-
-    // read from db instead
-    const isFixed = true;
 
     if (isFixed) {
         placeFixedPoints(i, window.innerWidth, window.innerHeight, x1, y1, x2, y2);
@@ -285,6 +295,16 @@ function placeChecks() {
     document.getElementById('fake').style.top = `${checkpointPairsCoords[trialno][1][1]}px`;
     document.getElementById("fakeText").innerHTML = checkpointPairsLabel[trialno][1];
 }
+
+getParameters().then(params => {
+    trialLimit = params.num_trials;
+    blockLimit = params.num_blocks;
+    nodeRadius = params.node_radius;
+    minAngle = params.minAngle;
+    middlex = (window.innerWidth / 2) - nodeRadius;
+    middley = (window.innerHeight / 4) + (window.innerHeight / 2) - nodeRadius;
+    isFixed = params.fixed_or_rand;
+});
 
 getIDBlock().then(data => {
     console.log(data); // Logs the data after the promise is resolved
