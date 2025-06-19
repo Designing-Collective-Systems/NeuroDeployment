@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="./styles/style2.css" rel="stylesheet" />
+    <link rel="shortcut icon" href="">
+    <title>Spiral Tremor Detection</title>
+    <style>
+        canvas {
+            border: 1px solid #ccc;
+            margin-top: 20px;
+            touch-action: none; /* Prevent scroll/zoom while touching */
+        }
+    </style>
+</head>
+<body>
+<h1>Spiral Tremor Detection</h1>
+<p>Use your finger or mouse to trace the spiral as smoothly as possible:</p>
+<canvas id="draw-area" width="400" height="400"></canvas>
+
+<script type="module">
+    import { SpiralTremorDetector } from './script/test4.js';
+
+    window.addEventListener('DOMContentLoaded', () => {
+        const canvas = document.getElementById('draw-area');
+
+        const detector = new SpiralTremorDetector(canvas, result => {
+            console.log("Spiral Tremor Analysis:", result);
+            if (result.severity && result.severity !== "None") {
+                alert(`Tremor Severity: ${result.severity} (Avg Deviation: ${result.averageDeviation})`);
+            } else if (result.error) {
+                alert(result.error);
+            } else {
+                alert("No tremor detected.");
+            }
+        });
+
+        ['touchstart', 'touchmove', 'touchend'].forEach(eventType => {
+            canvas.addEventListener(eventType, e => {
+                e.preventDefault();
+            }, { passive: false });
+        });
+    });
+</script>
+</body>
+</html>
