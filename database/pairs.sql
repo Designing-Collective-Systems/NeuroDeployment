@@ -1,3 +1,5 @@
+CREATE SEQUENCE IF NOT EXISTS pairs_id_seq;
+
 CREATE TABLE IF NOT EXISTS public.pairs
 (
     id integer NOT NULL DEFAULT nextval('pairs_id_seq'::regclass),

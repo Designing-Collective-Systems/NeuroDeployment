@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Phone Tremor Detection</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            text-align: center;
+            padding: 40px;
+        }
+        #start-btn {
+            padding: 10px 20px;
+            font-size: 18px;
+        }
+        #status {
+            margin-top: 20px;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+<h1>Phone Tremor Detection</h1>
+<p>Place your hand under the phone (screen up), then press "Start Test".</p>
+<button id="start-btn">Start Test</button>
+<p id="status">Waiting...</p>
+
+<script type="module">
+    import { HoldTremorDetector } from './script/test5.js';
+
+    const startBtn = document.getElementById('start-btn');
+    const status = document.getElementById('status');
+
+    startBtn.addEventListener('click', async () => {
+        status.textContent = "Checking permissions...";
+
+        // ✅ iOS 13+ requires user permission for motion access
+        if (typeof DeviceMotionEvent !== "undefined" &&
+            typeof DeviceMotionEvent.requestPermission === "function") {
+            try {
+                const response = await DeviceMotionEvent.requestPermission();
+                if (response !== "granted") {
+                    status.textContent = "Permission denied for motion sensors.";
+                    return;
+                }
+            } catch (e) {
+                status.textContent = "Motion permission error.";
+                return;
+            }
+        }
+
+        status.textContent = "Testing... Hold the phone still for 8 seconds.";
+
+        const detector = new HoldTremorDetector(result => {
+            if (result.error) {
+                status.textContent = "Error: " + result.error;
+            } else {
+                status.textContent = `Tremor Severity: ${result.severity} (Std Dev: ${result.stdDev})`;
+            }
+        });
+
+        detector.start();
+    });
+</script>
+</body>
+</html>

@@ -1,7 +1,7 @@
 -- Table: public.users
 
 -- DROP TABLE IF EXISTS public.users;
-
+CREATE SEQUENCE IF NOT EXISTS users_id_seq;
 CREATE TABLE IF NOT EXISTS public.users
 (
     id integer NOT NULL DEFAULT nextval('users_id_seq'::regclass),

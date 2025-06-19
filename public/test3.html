@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="./styles/style2.css" rel="stylesheet" />
+    <link rel="shortcut icon" href="">
+    <title>Touch Events Example</title>
+    <script src="./script/measures.js" defer></script>
+    <script src="./script/test3.js" defer></script>
+    <style>
+        canvas {
+            border: 1px solid #ccc;
+            margin-top: 20px;
+            touch-action: none; /* Prevent scroll/zoom while touching */
+        }
+    </style>
+</head>
+<body>
+<h1>Touch Tremor Detection</h1>
+<p>Use your finger or mouse to draw a straight line on the canvas from left to right:</p>
+<canvas id="draw-area" width="400" height="300"></canvas>
+
+<script type="module">
+    import { TremorDetector } from './script/test3.js';
+
+    window.addEventListener('DOMContentLoaded', () => {
+        const canvas = document.getElementById('draw-area');
+
+        const detector = new TremorDetector(canvas, result => {
+            console.log("Tremor Analysis Result:", result);
+            if (result.severity && result.severity !== "None") {
+                alert(`Tremor Severity: ${result.severity}`);
+            } else if (result.error) {
+                alert(result.error);
+            } else {
+                alert("No tremor detected.");
+            }
+        });
+
+        ['touchstart', 'touchmove', 'touchend'].forEach(eventType => {
+            canvas.addEventListener(eventType, e => {
+                e.preventDefault();
+            }, { passive: false });
+        });
+    });
+</script>
+</body>
+</html>

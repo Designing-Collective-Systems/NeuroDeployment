@@ -20,6 +20,10 @@
     <!-- <button id="startButton" type="button">Start Test</button> -->
     <button id="test1Button" disabled>Select Test 1</button>
     <button id="test2Button" disabled>Select Test 2</button>
+    <button id="test3Button" disabled>Select Test 3</button>
+    <button id="test4Button" disabled>Select Test 4</button>
+    <button id="test5Button" disabled>Select Test 5</button>
+
 
     <script src="/socket.io/socket.io.js"></script>
     <script>
@@ -28,7 +32,7 @@
       const participantId = sessionStorage.getItem('participantId');
       console.log(`Received participantUsername: ${participantUsername}`);
       console.log('Received participant ID stored:', sessionStorage.getItem('participantId'));
-      
+
       socket.on('roomCreated', (data) => {
       const { roomId, participantId } = data;
 
@@ -42,6 +46,9 @@
         console.log('Received "go" event. Enabling test selection buttons...');
         document.getElementById("test1Button").disabled = false;
         document.getElementById("test2Button").disabled = false;
+        document.getElementById("test3Button").disabled = false;
+        document.getElementById("test4Button").disabled = false;
+        document.getElementById("test5Button").disabled = false;
       });
       // Function to start Test 1
       document.getElementById("test1Button").addEventListener("click", () => {
@@ -53,6 +60,28 @@
       document.getElementById("test2Button").addEventListener("click", () => {
         socket.emit('startTest', { test: 'test2', participantId: participantId });
         window.location.href = "/test2.html"; // Navigate to Test 2
+      });
+      socket.on("roomNotFound", () => {
+        alert("Room not found. Please contact the caregiver.");
+      });
+      // Function to start Test 3
+      document.getElementById("test3Button").addEventListener("click", () => {
+        socket.emit('startTest', { test: 'test3', participantId: participantId });
+        window.location.href = "/test3.html"; // Navigate to Test 2
+      });
+      socket.on("roomNotFound", () => {
+        alert("Room not found. Please contact the caregiver.");
+      });
+      document.getElementById("test4Button").addEventListener("click", () => {
+        socket.emit('startTest', { test: 'test4', participantId: participantId });
+        window.location.href = "/test4.html"; // Navigate to Test 2
+      });
+      socket.on("roomNotFound", () => {
+        alert("Room not found. Please contact the caregiver.");
+      });
+      document.getElementById("test5Button").addEventListener("click", () => {
+        socket.emit('startTest', { test: 'test5', participantId: participantId });
+        window.location.href = "/test5.html"; // Navigate to Test 2
       });
       socket.on("roomNotFound", () => {
         alert("Room not found. Please contact the caregiver.");
