@@ -6,7 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="./styles/style2.css" rel="stylesheet" />
     <link rel="shortcut icon" href="">
-    <title>Spiral Tremor Detection</title>
+    <title>Touch Events Example</title>
+    <script src="./script/measures.js" defer></script>
+    <script src="./script/test3.js" defer></script>
     <style>
         canvas {
             border: 1px solid #ccc;
@@ -16,20 +18,20 @@
     </style>
 </head>
 <body>
-<h1>Spiral Tremor Detection</h1>
-<p>Use your finger or mouse to trace the spiral as smoothly as possible:</p>
-<canvas id="draw-area" width="400" height="400"></canvas>
+<h1>Touch Tremor Detection</h1>
+<p>Use your finger or mouse to draw a straight line on the canvas from left to right:</p>
+<canvas id="draw-area" width="400" height="300"></canvas>
 
 <script type="module">
-    import { SpiralTremorDetector } from './script/test4.js';
+    import { TremorDetector } from './script/test3.js';
 
     window.addEventListener('DOMContentLoaded', () => {
         const canvas = document.getElementById('draw-area');
 
-        const detector = new SpiralTremorDetector(canvas, result => {
-            console.log("Spiral Tremor Analysis:", result);
+        const detector = new TremorDetector(canvas, result => {
+            console.log("Tremor Analysis Result:", result);
             if (result.severity && result.severity !== "None") {
-                alert(`Tremor Severity: ${result.severity} (Avg Deviation: ${result.averageDeviation})`);
+                alert(`Tremor Severity: ${result.severity}`);
             } else if (result.error) {
                 alert(result.error);
             } else {
