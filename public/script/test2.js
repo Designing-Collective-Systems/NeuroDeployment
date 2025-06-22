@@ -453,8 +453,7 @@ function closeErrorModal() {
 
 function closeResultsModal() {
 	document.getElementById("resultsModal").style.display = 'none';
-	window.location.replace("/maxspeedinstruction");
-
+	window.location.replace("maxspeedinstruction.html");
 }
 
 function closeRestartModal() {

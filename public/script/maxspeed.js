@@ -114,7 +114,7 @@ function closeErrorModal() {
 
 function closeResultsModal() {
     document.getElementById("resultsModal").style.display = 'none';
-    window.location.replace("/thanks");
+    window.location.replace("/thanks"); // this next
 
 }
 
