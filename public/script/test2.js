@@ -2,7 +2,7 @@
 
 let startTime; // beginning of first touch
 
-let pid;
+let participantID;
 let blockLimit;
 let trialLimit;
 let nodeRadius;
@@ -43,7 +43,7 @@ const getIDBlock = async function () {
 }
 
 const getParameters = async function () {
-	const response = await fetch('/getParameters');
+	const response = await fetch('/api/results/getParameters');
 	const data = await response.json();
 	console.log(data);
 	return data;

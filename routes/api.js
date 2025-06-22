@@ -21,6 +21,7 @@ router.delete('/measures/:id', measureController.deleteMeasures); // Delete meas
 
 // Results routes
 router.get('/results/calculateResult', resultsController.getLatestResult);
+router.get('/results/getParameters', resultsController.getParameters);
 router.post('/results/submitdata', resultsController.submitResult);
 
 // Auth routes
