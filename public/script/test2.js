@@ -2,23 +2,35 @@
 
 let startTime; // beginning of first touch
 
-let participantID;
-let blockno;
+let pid;
+let blockLimit;
+let trialLimit;
+let nodeRadius;
+let minAngle;
+let isFixed;
 
-const blockLimit = 4;
+let blockno;
+let trialno = -1;
+
+let start = 0;
+
+// const circleRadius = 40;
+// const minAngle = 30;
+
+let middlex;
+let middley;
+
+// or 4 for trail making
+// const blockLimit = 8;
+// const trialLimit = 5 * 2;
+
 const checkpointStart = document.getElementById('checkpoint1');
 const checkpointFinal = document.getElementById('checkpointE');
-const checkpointPairs = [
-	[document.getElementById('checkpointA'), document.getElementById('checkpoint2Fake')],
-	[document.getElementById('checkpoint2'), document.getElementById('checkpointBFake')],
-	[document.getElementById('checkpointB'), document.getElementById('checkpoint3Fake')],
-	[document.getElementById('checkpoint3'), document.getElementById('checkpointCFake')],
-	[document.getElementById('checkpointC'), document.getElementById('checkpoint4Fake')],
-	[document.getElementById('checkpoint4'), document.getElementById('checkpointDFake')],
-	[document.getElementById('checkpointD'), document.getElementById('checkpoint5Fake')],
-	[document.getElementById('checkpoint5'), document.getElementById('checkpointEFake')]
-];
-let phase = -1; // represents which checkpoint is next: -1 = 1, 0 = A, 1 = 2, 2 = B, etc to work nicely with the checkpointPairs array
+const checkpointPairsLabel = [['A', '2'], ['2', 'B'], ['B', '3'], ['3', 'C'], ['C', '4'], ['4', 'D'], ['D', '5'], ['5', 'E'], ['E', '6'], ['6', 'F'], ['F', '7'], ['7', 'G'],
+['G', '8'], ['8', 'H'], ['H', '9'], ['9', 'I'], ['I', '10'], ['10', 'J'], ['J', '11'], ['11', 'K'], ['K', '12'], ['12', 'L'], ['L', '13'], ['13', 'M'], ['M', '14'], ['14', 'N'],
+['N', '15'], ['15', 'O'], ['O', '16'], ['16', 'P'], ['P', '17'], ['17', 'Q'], ['Q', '18'], ['18', 'R'], ['R', '19'], ['19', 'S'], ['S', '20'], ['20', 'T'], ['T', '21'], ['21', 'U'],
+['U', '22'], ['22', 'V'], ['V', '23'], ['23', 'W'], ['W', '24'], ['24', 'X'], ['X', '25'], ['25', 'Y'], ['Y', '26'], ['26', 'Z'], ['Z', '27']];
+let checkpointPairsCoords = []
 let error = false; // if in error state
 // this is an array of arrays of coordinates.
 const coords = [];
@@ -30,6 +42,13 @@ const getIDBlock = async function () {
 	return data;
 }
 
+const getParameters = async function () {
+	const response = await fetch('/getParameters');
+	const data = await response.json();
+	console.log(data);
+	return data;
+};
+
 //console.log(participantID);
 //console.log(blockno);
 let end = 0;
@@ -39,103 +58,170 @@ function currentTime() {
 }
 
 
-function placePoints(pair) {
-	let currentRect
-	if (pair == 0) {
-		currentRect = checkpointStart.getBoundingClientRect();
+function placeFixedPoints(i, screenWidth, screenHeight, x1, y1, x2, y2) {
+	// Define fixed relative positions for real and fake nodes in opposite corners/sides
+	const fixedRelativePositions = [
+		[[10, 10], [60, 30]],     // Real: A, Fake: 2
+		[[70, 60], [55, 20]],     // Real: 2, Fake: B
+		[[10, 75], [70, 30]],     // B
+		[[20, 30], [50, 30]],     // 3
+		[[70, 40], [20, 70]],     // C
+		[[60, 10], [10, 50]],     // 4
+		[[10, 70], [30, 10]],     // Real: D, Fake: 5
+		[[70, 10], [60, 50]],     // 5
+		[[20, 70], [75, 30]],     // E
+		[[50, 70], [30, 20]],     // 6
+		[[10, 10], [60, 30]],     // F
+		[[70, 40], [20, 70]],     // 7
+		[[10, 70], [30, 10]],     // G
+		[[70, 10], [60, 50]],     // 8
+		[[20, 30], [50, 30]],     // H
+		[[60, 10], [10, 50]],     // 9
+		[[10, 70], [30, 10]],     // I
+		[[70, 10], [60, 50]],     // 10
+		[[10, 10], [60, 30]],     // J
+		[[70, 60], [55, 20]],     // 11
+		[[10, 75], [70, 30]],     // K
+		[[20, 30], [50, 30]],     // 12
+		[[70, 40], [20, 70]],     // L
+		[[60, 10], [10, 50]],     // 13
+		[[10, 70], [30, 10]],     // M
+		[[70, 10], [60, 50]],     // 14
+		[[20, 70], [75, 30]],     // N
+		[[50, 70], [30, 20]],     // 15
+		[[10, 10], [60, 30]],     // O
+		[[70, 40], [20, 70]],     // 16
+		[[10, 70], [30, 10]],     // P
+		[[70, 10], [60, 50]],     // 17
+		[[20, 30], [50, 30]],     // Q
+		[[60, 10], [10, 50]],     // 18
+		[[10, 70], [30, 10]],     // R
+		[[70, 10], [60, 50]],     // 19
+		[[10, 10], [60, 30]],     // S
+		[[70, 60], [55, 20]],     // 20
+		[[10, 75], [70, 30]],     // T
+		[[60, 10], [10, 50]],     // 21
+		[[10, 10], [60, 30]],     // U
+		[[70, 60], [55, 20]],     // 22
+		[[10, 75], [70, 30]],     // V
+		[[20, 30], [50, 30]],     // 23
+		[[70, 40], [20, 70]],     // W
+		[[60, 10], [10, 50]],     // 24
+		[[10, 70], [30, 10]],     // X
+		[[70, 10], [60, 50]],     // 25
+		[[10, 10], [60, 30]],     // Y
+		[[70, 60], [55, 20]],     // 26
+		[[10, 75], [70, 30]],     // Z
+		[[60, 10], [10, 50]],     // 27
+	];
+
+	// Use the fixed positions based on the iteration, scale them to the current screen size
+	if (i < fixedRelativePositions.length) {
+		// Scale percentages to actual pixel coordinates for real node
+		x1 = (fixedRelativePositions[i][0][0] / 100) * screenWidth;
+		y1 = (fixedRelativePositions[i][0][1] / 100) * screenHeight;
+
+		// Scale percentages to actual pixel coordinates for fake node
+		x2 = (fixedRelativePositions[i][1][0] / 100) * screenWidth;
+		y2 = (fixedRelativePositions[i][1][1] / 100) * screenHeight;
+		checkpointPairsCoords.push([[x1, y1], [x2, y2]]);
 	} else {
-		checkpointPairs[pair - 1][0].style.display = 'flex';
-		currentRect = checkpointPairs[pair - 1][0].getBoundingClientRect(); // this function only works on visible things, so i have to turn on display before i get the rect to make it work; this is stupid
-		checkpointPairs[pair - 1][0].style.display = 'none';
+		// console.error("No more fixed positions available for iteration: " + i);
 	}
-	let rectA = new DOMRect(0, 0, 80, 80);
-	let rectB = new DOMRect(0, 0, 80, 80);
-	do {
-		if (window.innerWidth > window.innerHeight) { // place in quadrants corresponding to current point
-			if (pair == 0) { // startpoint
-				rectA.y = 10 + Math.random() * (window.innerHeight / 2 - 100); // top
-				rectA.x = 10 + Math.random() * (window.innerWidth / 2 - 100); // left
-				rectB.y = 10 + Math.random() * (window.innerHeight / 2 - 100); // top
-				rectB.x = window.innerWidth / 2 + 10 + Math.random() * (window.innerWidth / 2 - 100); // right
-			} else if (currentRect.x < window.innerWidth / 2 && currentRect.y < window.innerHeight / 2) { // top left quadrant
-				rectA.y = 10 + Math.random() * (window.innerHeight / 2 - 100); // top
-				rectA.x = window.innerWidth / 2 + Math.random() * (window.innerWidth / 2 - 100); // right
-				rectB.y = window.innerHeight / 2 + 10 + Math.random() * (window.innerHeight / 2 - 100); // bottom
-				rectB.x = Math.random() > 1 / 2 ? 10 + Math.random() * (window.innerWidth / 2 - 100) : window.innerWidth / 2 + 10 + Math.random() * (window.innerWidth / 2 - 100); // left or right
-			} else if (currentRect.x > window.innerWidth / 2 && currentRect.y < window.innerHeight / 2) { // top right
-				rectA.y = 10 + Math.random() * (window.innerHeight / 2 - 100); // top
-				rectA.x = 10 + Math.random() * (window.innerWidth / 2 - 100); // left
-				rectB.y = window.innerHeight / 2 + 10 + Math.random() * (window.innerHeight / 2 - 100); // bottom
-				rectB.x = Math.random() > 1 / 2 ? 10 + Math.random() * (window.innerWidth / 2 - 100) : window.innerWidth / 2 + 10 + Math.random() * (window.innerWidth / 2 - 100); // left or right
-			} else if (currentRect.x < window.innerWidth / 2 && currentRect.y > window.innerHeight / 2) { // bottom left
-				rectA.y = window.innerHeight / 2 + 10 + Math.random() * (window.innerHeight / 2 - 100); // bottom
-				rectA.x = window.innerWidth / 2 + Math.random() * (window.innerWidth / 2 - 100); // right
-				rectB.y = 10 + Math.random() * (window.innerHeight / 2 - 100); // top
-				rectB.x = Math.random() > 1 / 2 ? 10 + Math.random() * (window.innerWidth / 2 - 100) : window.innerWidth / 2 + 10 + Math.random() * (window.innerWidth / 2 - 100); // left or right
-			} else if (currentRect.x > window.innerWidth / 2 && currentRect.y > window.innerHeight / 2) { // bottom right
-				rectA.y = window.innerHeight / 2 + 10 + Math.random() * (window.innerHeight / 2 - 100); // bottom
-				rectA.x = 10 + Math.random() * (window.innerWidth / 2 - 100); // left
-				rectB.y = 10 + Math.random() * (window.innerHeight / 2 - 100); // top
-				rectB.x = Math.random() > 1 / 2 ? 10 + Math.random() * (window.innerWidth / 2 - 100) : window.innerWidth / 2 + 10 + Math.random() * (window.innerWidth / 2 - 100); // left or right
-			} else { // something went wrong
-				throw new Error('cannot find current point');
+}
+
+function placeVariedPoints(i, screenWidth, screenHeight, x1, y1, x2, y2) {
+	if (i == 0) {
+		x1 = Math.random() * (screenWidth / 2 - 100);
+		y1 = Math.random() * (screenHeight / 2 - 100);
+		x2 = (screenWidth / 2) + (Math.random() * (screenWidth / 2 - 100));
+		y2 = (Math.random() * (screenHeight / 2 - 100));
+
+		if (Math.abs(Math.atan2(middley - y1, middlex - x1) * 180 / Math.PI - Math.atan2(middley - y2, middlex - x2) * 180 / Math.PI) < minAngle) {
+			placeVariedPoints(i, screenWidth, screenHeight, x1, y1, x2, y2)
+		}
+		else {
+			checkpointPairsCoords.push([[x1, y1], [x2, y2]]);
+		}
+
+	}
+	else {
+		if (checkpointPairsCoords[i - 1][0][0] < (screenWidth / 2) && checkpointPairsCoords[i - 1][0][1] < (screenHeight / 2)) {
+			x1 = Math.random() * (screenWidth - 100);
+			if (x1 < (screenWidth / 2)) {
+				y1 = (screenHeight / 2) + (Math.random() * (screenHeight / 2 - 100));
+				x2 = (screenWidth / 2) + (Math.random() * (screenWidth / 2 - 100));
+				y2 = (Math.random() * (screenHeight - 100));
 			}
-		} else {
-			if (pair == 0) { // startpoint
-				rectA.x = 10 + Math.random() * (window.innerWidth / 2 - 100); // left
-				rectA.y = 10 + Math.random() * (window.innerHeight / 2 - 100); // top
-				rectB.x = window.innerWidth / 2 + 10 + Math.random() * (window.innerWidth / 2 - 100); // right
-				rectB.y = 10 + Math.random() * (window.innerHeight / 2 - 100); // top
-			} else if (currentRect.x < window.innerWidth / 2 && currentRect.y < window.innerHeight / 2) { // top left quadrant
-				rectA.x = 10 + Math.random() * (window.innerWidth / 2 - 100); // left
-				rectA.y = window.innerHeight / 2 + 10 + Math.random() * (window.innerHeight / 2 - 100); // bottom
-				rectB.x = window.innerWidth / 2 + 10 + Math.random() * (window.innerWidth / 2 - 100); // right
-				rectB.y = Math.random() > 1 / 2 ? 10 + Math.random() * (window.innerHeight / 2 - 100) : window.innerHeight / 2 + 10 + Math.random() * (window.innerHeight / 2 - 100); // top or bottom
-			} else if (currentRect.x > window.innerWidth / 2 && currentRect.y < window.innerHeight / 2) { // top right
-				rectA.x = window.innerWidth / 2 + Math.random() * (window.innerWidth / 2 - 100); // right
-				rectA.y = window.innerHeight / 2 + 10 + Math.random() * (window.innerHeight / 2 - 100); // bottom
-				rectB.x = 10 + Math.random() * (window.innerWidth / 2 - 100); // left
-				rectB.y = Math.random() > 1 / 2 ? 10 + Math.random() * (window.innerHeight / 2 - 100) : window.innerHeight / 2 + 10 + Math.random() * (window.innerHeight / 2 - 100); // top or bottom
-			} else if (currentRect.x < window.innerWidth / 2 && currentRect.y > window.innerHeight / 2) { // bottom left
-				rectA.x = 10 + Math.random() * (window.innerWidth / 2 - 100); // left
-				rectA.y = 10 + Math.random() * (window.innerHeight / 2 - 100); // top
-				rectB.x = window.innerWidth / 2 + 10 + Math.random() * (window.innerWidth / 2 - 100); // right
-				rectB.y = Math.random() > 1 / 2 ? 10 + Math.random() * (window.innerHeight / 2 - 100) : window.innerHeight / 2 + 10 + Math.random() * (window.innerHeight / 2 - 100); // top or bottom
-			} else if (currentRect.x > window.innerWidth / 2 && currentRect.y > window.innerHeight / 2) { // bottom right
-				rectA.x = window.innerWidth / 2 + Math.random() * (window.innerWidth / 2 - 100); // right
-				rectA.y = 10 + Math.random() * (window.innerHeight / 2 - 100); // top
-				rectB.x = 10 + Math.random() * (window.innerWidth / 2 - 100); // left
-				rectB.y = Math.random() > 1 / 2 ? 10 + Math.random() * (window.innerHeight / 2 - 100) : window.innerHeight / 2 + 10 + Math.random() * (window.innerHeight / 2 - 100); // top or bottom
-			} else { // something went wrong
-				throw new Error('cannot find current point');
+			else {
+				y1 = (Math.random() * (screenHeight - 100));
+				x2 = (Math.random() * (screenWidth / 2 - 100));
+				y2 = (screenHeight / 2) + (Math.random() * (screenHeight / 2 - 100));
 			}
 		}
 
-
-	} while ( // insure points are more than 15 degrees apart
-		Math.abs(Math.atan2(currentRect.y - rectB.y, currentRect.x - rectB.x) * 180 / Math.PI - Math.atan2(currentRect.y - rectA.y, currentRect.x - rectA.x) * 180 / Math.PI) < 15
-	)
-
-	if (pair < checkpointPairs.length) {
-		if (Math.random() > 0.5) { // Coin flip whether A or B is next
-			checkpointPairs[pair][0].style.left = `${rectA.x}px`;
-			checkpointPairs[pair][0].style.top = `${rectA.y}px`;
-			checkpointPairs[pair][1].style.left = `${rectB.x}px`;
-			checkpointPairs[pair][1].style.top = `${rectB.y}px`;
-		} else {
-			checkpointPairs[pair][0].style.left = `${rectB.x}px`;
-			checkpointPairs[pair][0].style.top = `${rectB.y}px`;
-			checkpointPairs[pair][1].style.left = `${rectA.x}px`;
-			checkpointPairs[pair][1].style.top = `${rectA.y}px`;
+		if (checkpointPairsCoords[i - 1][0][0] > (screenWidth / 2) && checkpointPairsCoords[i - 1][0][1] < (screenHeight / 2)) {
+			x1 = Math.random() * (screenWidth - 100);
+			if (x1 > (screenWidth / 2)) {
+				y1 = (screenHeight / 2) + (Math.random() * (screenHeight / 2 - 100));
+				x2 = (Math.random() * (screenWidth / 2 - 100));
+				y2 = (Math.random() * (screenHeight - 100));
+			}
+			else {
+				y1 = (Math.random() * (screenHeight - 100));
+				x2 = (screenWidth / 2) + (Math.random() * (screenWidth / 2 - 100));
+				y2 = (screenHeight / 2) + (Math.random() * (screenHeight / 2 - 100));
+			}
 		}
-	} else {
-		if (Math.random > 0.5) {
-			checkpointFinal.style.left = `${rectA.x}px`;
-			checkpointFinal.style.top = `${rectA.y}px`;
-		} else {
-			checkpointFinal.style.left = `${rectA.x}px`;
-			checkpointFinal.style.top = `${rectA.y}px`;
+
+		if (checkpointPairsCoords[i - 1][0][0] < (screenWidth / 2) && checkpointPairsCoords[i - 1][0][1] > (screenHeight / 2)) {
+			x1 = Math.random() * (screenWidth - 100);
+			if (x1 < (screenWidth / 2)) {
+				y1 = (Math.random() * (screenHeight / 2 - 100));
+				x2 = (screenWidth / 2) + (Math.random() * (screenWidth / 2 - 100));
+				y2 = (Math.random() * (screenHeight - 100));
+			}
+			else {
+				y1 = (Math.random() * (screenHeight - 100));
+				x2 = (Math.random() * (screenWidth / 2 - 100));
+				y2 = (Math.random() * (screenHeight / 2 - 100));
+			}
 		}
+
+		if (checkpointPairsCoords[i - 1][0][0] > (screenWidth / 2) && checkpointPairsCoords[i - 1][0][1] > (screenHeight / 2)) {
+			x1 = Math.random() * (screenWidth - 100);
+			if (x1 > (screenWidth / 2)) {
+				y1 = (Math.random() * (screenHeight / 2 - 100));
+				x2 = (Math.random() * (screenWidth / 2 - 100));
+				y2 = (Math.random() * (screenHeight - 100));
+			}
+			else {
+				y1 = (Math.random() * (screenHeight - 100));
+				x2 = (screenWidth / 2) + (Math.random() * (screenWidth / 2 - 100));
+				y2 = (Math.random() * (screenHeight / 2 - 100));
+			}
+		}
+		if (Math.abs(Math.atan2(checkpointPairsCoords[i - 1][0][1] - y1, checkpointPairsCoords[i - 1][0][0] - x1) * 180 / Math.PI - Math.atan2(checkpointPairsCoords[i - 1][0][1] - y2, checkpointPairsCoords[i - 1][0][0] - x2) * 180 / Math.PI) < minAngle) {
+			placeVariedPoints(i, screenWidth, screenHeight, x1, y1, x2, y2)
+		}
+		else {
+			checkpointPairsCoords.push([[x1, y1], [x2, y2]]);
+		}
+	}
+}
+
+
+function placePoints(i) {
+	let x1 = 0; // Real node x
+	let y1 = 0; // Real node y
+	let x2 = 0; // Fake node x
+	let y2 = 0; // Fake node y
+
+	if (isFixed) {
+		placeFixedPoints(i, window.innerWidth, window.innerHeight, x1, y1, x2, y2);
+	}
+	else {
+		placeVariedPoints(i, window.innerWidth, window.innerHeight, x1, y1, x2, y2);
 	}
 }
 
@@ -144,9 +230,9 @@ function placePoints(pair) {
 function endblock() {
 	console.log("endblock");
 	if (!participantID) {
-        alert("Participant ID is missing. Please log in.");
-        return;
-    }
+		alert("Participant ID is missing. Please log in.");
+		return;
+	}
 	var data = { // create data object
 		participantid: participantID,
 		blockno: [],
@@ -187,8 +273,8 @@ function endblock() {
 
 	data = calculate_measures(coords, data);
 
-	
-	console.log("Data before sending:", data); 
+
+	console.log("Data before sending:", data);
 
 	fetch("/api/results/submitdata", { // send data to server
 		method: "POST",
@@ -205,139 +291,159 @@ function endblock() {
 	}
 }
 
+function placeChecks() {
+	document.getElementById('real').style.left = `${checkpointPairsCoords[trialno][0][0]}px`;
+	document.getElementById('real').style.top = `${checkpointPairsCoords[trialno][0][1]}px`;
+	document.getElementById("realText").innerHTML = checkpointPairsLabel[trialno][0];
+
+	document.getElementById('fake').style.left = `${checkpointPairsCoords[trialno][1][0]}px`;
+	document.getElementById('fake').style.top = `${checkpointPairsCoords[trialno][1][1]}px`;
+	document.getElementById("fakeText").innerHTML = checkpointPairsLabel[trialno][1];
+}
+
+
+
 participantID = sessionStorage.getItem('participantId');
-	// participantID = data.participantID;
-	if (!participantID) {
-        alert("Participant ID is missing. Please log in.");
-        window.location.replace("/login.html"); // Redirect to login if no participant ID
-    } else {
-		getIDBlock().then(data => {
-			console.log(data); // Logs the data after the promise is resolved
-			
-			blockno = data.blockno;
-		
-			if (blockno === blockLimit) {
-				// participantID = participantID + 1;
-				blockno = 0;
+// participantID = data.participantID;
+if (!participantID) {
+	alert("Participant ID is missing. Please log in.");
+	window.location.replace("/login.html"); // Redirect to login if no participant ID
+} else {
+	getParameters().then(params => {
+		trialLimit = params.num_trials;
+		blockLimit = params.num_blocks;
+		nodeRadius = params.node_radius;
+		minAngle = params.minAngle;
+		middlex = (window.innerWidth / 2) - nodeRadius;
+		middley = (window.innerHeight / 4) + (window.innerHeight / 2) - nodeRadius;
+		isFixed = params.fixed_or_rand;
+	});
+
+	getIDBlock().then(data => {
+		console.log(data); // Logs the data after the promise is resolved
+
+		blockno = data.blockno;
+
+		if (blockno === blockLimit) {
+			// participantID = participantID + 1;
+			blockno = 0;
+		}
+
+		// come back to this
+		// for (let pair in [0, 1, 2, 3, 4, 5, 6, 7, 8]) {
+		// 	placePoints(pair); // this generates the locations of all of the points ahead of time
+		// }
+		for (let i = 0; i < 52; i++) {
+			placePoints(i); // this generates the locations of all of the points ahead of time
+		}
+		document.getElementById('origin').style.left = `${middlex}px`;
+		document.getElementById('origin').style.top = `${middley}px`;
+		document.getElementById('origin').style.display = 'flex';
+
+		// At the touch start
+		document.addEventListener("touchstart", e => {
+			if (coords.length == 0) {
+				startTime = Date.now(); // if first touch, set startTime
 			}
-		
-			for (let pair in [0, 1, 2, 3, 4, 5, 6, 7, 8]) {
-				placePoints(pair); // this generates the locations of all of the points ahead of time
-			}
-		
-			// At the touch start
-			document.addEventListener("touchstart", e => {
-				if (coords.length == 0) {
-					startTime = Date.now(); // if first touch, set startTime
-				}
-		
-				// add point to coords
-				const touch = e.changedTouches[0];
-		
-				// Advance phase if starting on startpoint or previous with in error state
-				if (!error && document.elementsFromPoint(touch.pageX, touch.pageY).includes(checkpointStart) && phase == -1) {
-					phase++;
-					checkpointPairs[phase][0].style.display = 'flex';
-					checkpointPairs[phase][1].style.display = 'flex';
-				} else if (error && document.elementsFromPoint(touch.pageX, touch.pageY).includes(phase > -1 ? checkpointPairs[phase][0] : checkpointStart)) {
-					if (phase < checkpointPairs.length - 1) {
-						phase++;
-						checkpointPairs[phase][0].style.display = 'flex';
-						checkpointPairs[phase][1].style.display = 'flex';
-					}
-					else {
-						checkpointPairs[phase][0].style.display = 'flex';
-						checkpointFinal.style.display = 'flex';
-						phase++;
-					}
+
+			// add point to coords
+			const touch = e.changedTouches[0];
+
+			if (document.elementsFromPoint(touch.pageX, touch.pageY).includes(document.getElementById('origin'))) {
+				trialno++;
+				placeChecks();
+				document.getElementById('real').style.display = 'flex';
+				document.getElementById('fake').style.display = 'flex';
+
+				const pointer = document.getElementById('pointer')
+				pointer.style.display = 'flex';
+				pointer.style.top = `${touch.pageY}px`
+				pointer.style.left = `${touch.pageX}px`
+				pointer.id = "pointer"
+
+				if (error) {
 					error = false;
 				}
-		
-				if (phase > -1 && phase < checkpointPairs.length) {
-					coords.push([touch.screenX, touch.screenY, currentTime(), checkpointPairs[phase][0].id, checkpointPairs[phase][0].getBoundingClientRect().x, checkpointPairs[phase][0].getBoundingClientRect().y, checkpointPairs[phase][1].id, checkpointPairs[phase][1].getBoundingClientRect().x, checkpointPairs[phase][1].getBoundingClientRect().y]);
-				}
-		
-			});
-		
-			document.addEventListener("touchmove", e => {
-				const touch = e.changedTouches[0];
-		
-				// Advance phase if on correct point, show error message if not
-				if (!error && document.elementsFromPoint(touch.pageX, touch.pageY).includes(phase < checkpointPairs.length ? checkpointPairs[phase][0] : checkpointFinal)) {
-					phase++;
-					checkpointStart.style.display = 'none';
-					if (phase < checkpointPairs.length) { // middle point
-						checkpointPairs[phase][0].style.display = 'flex';
-						checkpointPairs[phase][1].style.display = 'flex';
-						coords.push([touch.screenX, touch.screenY, currentTime(), checkpointPairs[phase][0].id, checkpointPairs[phase][0].getBoundingClientRect().x, checkpointPairs[phase][0].getBoundingClientRect().y, checkpointPairs[phase][1].id, checkpointPairs[phase][1].getBoundingClientRect().x, checkpointPairs[phase][1].getBoundingClientRect().y]); // add point to coords
-					} else if (phase == checkpointPairs.length) { // last point
-						checkpointFinal.style.display = 'flex'
-						coords.push([touch.screenX, touch.screenY, currentTime(), checkpointFinal.id, checkpointFinal.getBoundingClientRect().x, checkpointFinal.getBoundingClientRect().y, 'none', -1, -1]); // add point to coords
-					}
-					if (phase > 0 && phase - 1 < checkpointPairs.length) {
-						checkpointPairs[phase - 1][1].style.display = 'none';
-					}
-					if (phase > 1 && phase - 2 < checkpointPairs.length) {
-						checkpointPairs[phase - 2][0].style.display = 'none';
-					}
-		
-					if (end === 0 && document.elementsFromPoint(touch.pageX, touch.pageY).includes(checkpointFinal)) {
-						end = 1;
-						endblock();
-					}
-		
-				} else if (!error && document.elementsFromPoint(touch.pageX, touch.pageY).includes(phase < checkpointPairs.length ? checkpointPairs[phase][1] : null)) {
-					coords.push([-2, -2, -2, checkpointPairs[phase][0].id, checkpointPairs[phase][0].getBoundingClientRect().x, checkpointPairs[phase][0].getBoundingClientRect().y, checkpointPairs[phase][1].id, checkpointPairs[phase][1].getBoundingClientRect().x, checkpointPairs[phase][1].getBoundingClientRect().y]);
-					document.getElementById("errorModal").style.display = 'block'; // show error modal
-					checkpointPairs[phase][0].style.display = 'none';
-					checkpointPairs[phase][1].style.display = 'none';
-					phase--; // force user to go back
-					error = true; // set error state
-				}
-				else {
-					if (phase < checkpointPairs.length) { // middle point
-						coords.push([touch.screenX, touch.screenY, currentTime(), checkpointPairs[phase][0].id, checkpointPairs[phase][0].getBoundingClientRect().x, checkpointPairs[phase][0].getBoundingClientRect().y, checkpointPairs[phase][1].id, checkpointPairs[phase][1].getBoundingClientRect().x, checkpointPairs[phase][1].getBoundingClientRect().y]); // add point to coords
-					} else if (phase == checkpointPairs.length) { // last point
-						coords.push([touch.screenX, touch.screenY, currentTime(), checkpointFinal.id, checkpointFinal.getBoundingClientRect().x, checkpointFinal.getBoundingClientRect().y, 'none', -1, -1]); // add point to coords
-					}
-				}
-				//console.log(currentTime());
-			});
-		
-			document.addEventListener("touchend", e => {
-				// add point to coords
-				const touch = e.changedTouches[0];
-		
-				//console.log(currentTime());
-		
-				if (end === 0 && document.elementsFromPoint(touch.pageX, touch.pageY).includes(checkpointFinal)) { // if at final point, submit data
+				coords.push([touch.screenX, touch.screenY, currentTime(), checkpointPairsLabel[trialno][0], checkpointPairsCoords[trialno][0][0], checkpointPairsCoords[trialno][0][1],
+				checkpointPairsLabel[trialno][1], checkpointPairsCoords[trialno][1][0], checkpointPairsCoords[trialno][1][1]]);
+				start = 1;
+			}
+		});
+
+		document.addEventListener("touchmove", e => {
+			const touch = e.changedTouches[0];
+
+			const pointer = document.getElementById('pointer')
+			pointer.style.top = `${touch.pageY}px`
+			pointer.style.left = `${touch.pageX}px`
+
+			// Advance trialno if on correct point, show error message if not
+			if (!error && document.elementsFromPoint(touch.pageX, touch.pageY).includes(document.getElementById('real'))) {
+
+				coords.push([touch.screenX, touch.screenY, currentTime(), checkpointPairsLabel[trialno][0], checkpointPairsCoords[trialno][0][0], checkpointPairsCoords[trialno][0][1],
+				checkpointPairsLabel[trialno][1], checkpointPairsCoords[trialno][1][0], checkpointPairsCoords[trialno][1][1]]);
+
+				trialno++;
+				document.getElementById('origin').style.left = document.getElementById('real').style.left;
+				document.getElementById('origin').style.top = document.getElementById('real').style.top;
+				document.getElementById("originText").innerHTML = checkpointPairsLabel[trialno - 1][0];
+				placeChecks();
+
+				if (end === 0 && trialno === trialLimit) {
 					end = 1;
 					endblock();
 				}
-				else {
-					if (!error && end === 0) {
-						if (phase < checkpointPairs.length) {
-							coords.push([-1, -1, -1, checkpointPairs[phase][0].id, checkpointPairs[phase][0].getBoundingClientRect().x, checkpointPairs[phase][0].getBoundingClientRect().y, checkpointPairs[phase][1].id, checkpointPairs[phase][1].getBoundingClientRect().x, checkpointPairs[phase][1].getBoundingClientRect().y]);
-							document.getElementById("liftModal").style.display = 'block'; // show error modal
-							checkpointPairs[phase][0].style.display = 'none';
-							checkpointPairs[phase][1].style.display = 'none';
-		
-							phase--; // force user to go back
-							error = true; // set error state
-						}
-						else {
-							coords.push([-1, -1, -1, checkpointFinal.id, checkpointFinal.getBoundingClientRect().x, checkpointFinal.getBoundingClientRect().y, 'none', -1, -1]);
-							document.getElementById("liftModal").style.display = 'block'; // show error modal
-							checkpointFinal.style.display = 'none';
-							//checkpointPairs[phase - 1][0].style.display = 'none';
-							phase--; // force user to go back
-							error = true; // set error state
-						}
-					}
+
+			} else if (!error && document.elementsFromPoint(touch.pageX, touch.pageY).includes(document.getElementById('fake'))) {
+				coords.push([-2, -2, currentTime(), checkpointPairsLabel[trialno][0], checkpointPairsCoords[trialno][0][0], checkpointPairsCoords[trialno][0][1],
+				checkpointPairsLabel[trialno][1], checkpointPairsCoords[trialno][1][0], checkpointPairsCoords[trialno][1][1]]);
+
+				document.getElementById("errorModal").style.display = 'block'; // show error modal
+				document.getElementById('real').style.display = 'none';
+				document.getElementById('fake').style.display = 'none';
+				trialno--; // force user to go back
+				error = true; // set error state
+				start = 0;
+			}
+			else {
+				if (!error) {
+					coords.push([touch.screenX, touch.screenY, currentTime(), checkpointPairsLabel[trialno][0], checkpointPairsCoords[trialno][0][0], checkpointPairsCoords[trialno][0][1],
+					checkpointPairsLabel[trialno][1], checkpointPairsCoords[trialno][1][0], checkpointPairsCoords[trialno][1][1]]);
 				}
-			});
+			}
 		});
-	}
+
+		document.addEventListener("touchend", e => {
+			// add point to coords
+			const touch = e.changedTouches[0];
+
+			const pointer = document.getElementById('pointer');
+			pointer.style.display = 'none';
+
+			//console.log(currentTime());
+
+			if (end === 0 && document.elementsFromPoint(touch.pageX, touch.pageY).includes(document.getElementById('real')) && trialno === trialLimit) { // if at final point, submit data
+				end = 1;
+				endblock();
+			}
+			else {
+				if (!error && end === 0 && start === 1) {
+
+					coords.push([-1, -1, currentTime(), checkpointPairsLabel[trialno][0], checkpointPairsCoords[trialno][0][0], checkpointPairsCoords[trialno][0][1],
+					checkpointPairsLabel[trialno][1], checkpointPairsCoords[trialno][1][0], checkpointPairsCoords[trialno][1][1]]);
+
+					document.getElementById("liftModal").style.display = 'block'; // show error modal
+					document.getElementById('real').style.display = 'none';
+					document.getElementById('fake').style.display = 'none';
+
+					trialno--; // force user to go back
+					error = true; // set error state
+					start = 0;
+				}
+			}
+		});
+	});
+}
 
 
 function closeErrorModal() {
@@ -347,7 +453,7 @@ function closeErrorModal() {
 
 function closeResultsModal() {
 	document.getElementById("resultsModal").style.display = 'none';
-	window.location.replace("/");
+	window.location.replace("/maxspeedinstruction");
 
 }
 
