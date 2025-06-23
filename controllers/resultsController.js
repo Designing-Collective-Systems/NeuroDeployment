@@ -87,3 +87,28 @@ exports.submitResult = async (req, res) => {
         res.status(500).json({ msg: '500 Internal Server Error' });
     }
 };
+
+
+exports.submitMaxSpeedResult = async (req, res) => {
+    try {
+        const data = req.body;
+        console.log("Received data:", data);
+
+        for (let i = 0; i < data.coordx.length; i++) {
+            await pgClient.query(
+                'INSERT INTO max_speed (pid, coordx, coordy, coordt) VALUES ($1, $2, $3, $4)',
+                [
+                    data.participantid,
+                    data.coordx[i],
+                    data.coordy[i],
+                    data.coordt[i],
+                ]
+            );
+        }
+
+        res.status(200).json({ msg: 'Data successfully submitted' });
+    } catch (error) {
+        console.error('Error submitting data:', error);
+        res.status(500).json({ msg: '500 Internal Server Error' });
+    }
+};

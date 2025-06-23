@@ -23,6 +23,7 @@ router.delete('/measures/:id', measureController.deleteMeasures); // Delete meas
 router.get('/results/calculateResult', resultsController.getLatestResult);
 router.get('/results/getParameters', resultsController.getParameters);
 router.post('/results/submitdata', resultsController.submitResult);
+router.post('/results/submitmaxspeeddata', resultsController.submitMaxSpeedResult);
 
 // Auth routes
 

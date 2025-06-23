@@ -2,23 +2,14 @@
 
 let startTime; // beginning of first touch
 
-let pid;
+let participantID;
 
 let start = 0;
 
 let error = false; // if in error state
 // this is an array of arrays of coordinates.
 const coords = [];
-//let blockno = 1;
 
-const getIDBlock = async function () {
-    const response = await fetch('/calculateResult');
-    const data = await response.json(); // Correct way to parse JSON
-    return data;
-}
-
-//console.log(pid);
-//console.log(blockno);
 let end = 0;
 
 var intervalId;
@@ -30,20 +21,24 @@ function currentTime() {
 
 function endblock() {
     console.log("endblock");
+    if (!participantID) {
+        alert("Participant ID is missing. Please log in.");
+        return;
+    }
     var data = { // create data object
-        pid: [],
+        participantid: [],
         coordx: [],
         coordy: [],
         coordt: []
     };
     for (const coord of coords) { // add coords to data object
-        data.pid.push(pid);
+        data.participantid.push(participantID);
         data.coordx.push(Math.round(coord[0]));
         data.coordy.push(Math.round(coord[1]));
         data.coordt.push(coord[2]);
     }
 
-    fetch("/submitmaxspeeddata", { // send data to server
+    fetch("/api/results/submitmaxspeeddata", { // send data to server
         method: "POST",
         headers: {
             "Content-Type": "application/json", // as json
@@ -71,10 +66,14 @@ function startTimer(duration, display) {
     }, 1000);
 }
 
-getIDBlock().then(data => {
-    pid = data.pid;
 
-    // At the touch start
+participantID = sessionStorage.getItem('participantId');
+// participantID = data.participantID;
+if (!participantID) {
+    alert("Participant ID is missing. Please log in.");
+    window.location.replace("/login.html"); // Redirect to login if no participant ID
+} else {
+    // check this
     document.addEventListener("touchstart", e => {
         if (coords.length == 0) {
             startTime = Date.now(); // if first touch, set startTime
@@ -105,7 +104,9 @@ getIDBlock().then(data => {
         coords.push([-1, -1, currentTime()]);
         document.getElementById("liftModal").style.display = 'block'; // show error modal
     });
-});
+}
+
+
 
 function closeErrorModal() {
     document.getElementById("liftModal").style.display = 'none';
@@ -114,7 +115,7 @@ function closeErrorModal() {
 
 function closeResultsModal() {
     document.getElementById("resultsModal").style.display = 'none';
-    window.location.replace("/thanks"); // this next
-
+    // window.location.replace("/thanks");
+    window.location.replace("/");
 }
 
