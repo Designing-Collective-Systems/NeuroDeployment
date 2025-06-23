@@ -138,6 +138,7 @@ function placeVariedPoints(i, screenWidth, screenHeight, x1, y1, x2, y2) {
 		y2 = (Math.random() * (screenHeight / 2 - 100));
 
 		if (Math.abs(Math.atan2(middley - y1, middlex - x1) * 180 / Math.PI - Math.atan2(middley - y2, middlex - x2) * 180 / Math.PI) < minAngle) {
+			console.log(2);
 			placeVariedPoints(i, screenWidth, screenHeight, x1, y1, x2, y2)
 		}
 		else {
@@ -202,6 +203,7 @@ function placeVariedPoints(i, screenWidth, screenHeight, x1, y1, x2, y2) {
 			}
 		}
 		if (Math.abs(Math.atan2(checkpointPairsCoords[i - 1][0][1] - y1, checkpointPairsCoords[i - 1][0][0] - x1) * 180 / Math.PI - Math.atan2(checkpointPairsCoords[i - 1][0][1] - y2, checkpointPairsCoords[i - 1][0][0] - x2) * 180 / Math.PI) < minAngle) {
+			console.log(3);
 			placeVariedPoints(i, screenWidth, screenHeight, x1, y1, x2, y2)
 		}
 		else {
@@ -221,6 +223,7 @@ function placePoints(i) {
 		placeFixedPoints(i, window.innerWidth, window.innerHeight, x1, y1, x2, y2);
 	}
 	else {
+		console.log(1);
 		placeVariedPoints(i, window.innerWidth, window.innerHeight, x1, y1, x2, y2);
 	}
 }
@@ -234,7 +237,7 @@ function endblock() {
 		return;
 	}
 	var data = { // create data object
-		participantid: participantID,
+		participantid: [],
 		blockno: [],
 		coordx: [],
 		coordy: [],
@@ -255,7 +258,7 @@ function endblock() {
 	blockno = blockno + 1;
 	console.log(blockno);
 	for (const coord of coords) { // add coords to data object
-		data.participantid = participantID;
+		data.participantid.push(participantID);
 		data.blockno.push(blockno);
 		data.coordx.push(coord[0]);
 		data.coordy.push(coord[1]);
@@ -283,7 +286,7 @@ function endblock() {
 		},
 		body: JSON.stringify(data), // body is stringified json
 	});
-	if (blockno === blockLimit) {
+	if (blockno >= blockLimit) {
 		document.getElementById("resultsModal").style.display = 'block';
 	}
 	else {
@@ -324,8 +327,7 @@ if (!participantID) {
 
 		blockno = data.blockno;
 
-		if (blockno === blockLimit) {
-			// participantID = participantID + 1;
+		if (blockno >= blockLimit) {
 			blockno = 0;
 		}
 

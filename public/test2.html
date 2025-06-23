@@ -5,7 +5,7 @@
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE-edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link href="./styles/style2.css" rel="stylesheet" />
+  <link href="./styles/style3.css" rel="stylesheet" />
   <link rel="shortcut icon" href="">
   <title>Touch Events Example</title>
   <script src="./script/measures.js" defer> </script>
@@ -14,76 +14,19 @@
 
 <body>
 
-  <div class="checkpoint" id="checkpoint1">
-    <span class="label">1</span>
+  <div class="dot" id="pointer">
   </div>
 
-  <div class="checkpoint" id="checkpointA">
-    <span class="label">A</span>
+  <div class="checkpoint" id="origin">
+    <span class="label" id="originText">1</span>
   </div>
 
-  <div class="checkpoint" id="checkpoint2">
-    <span class="label">2</span>
+  <div class="checkpoint" id="real">
+    <span class="label" id="realText">A</span>
   </div>
 
-  <div class="checkpointFake" id="checkpoint2Fake">
-    <span class="label">2</span>
-  </div>
-
-  <div class="checkpoint" id="checkpointB">
-    <span class="label">B</span>
-  </div>
-
-  <div class="checkpointFake" id="checkpointBFake">
-    <span class="label">B</span>
-  </div>
-
-  <div class="checkpoint" id="checkpoint3">
-    <span class="label">3</span>
-  </div>
-
-  <div class="checkpointFake" id="checkpoint3Fake">
-    <span class="label">3</span>
-  </div>
-
-  <div class="checkpoint" id="checkpointC">
-    <span class="label">C</span>
-  </div>
-
-  <div class="checkpointFake" id="checkpointCFake">
-    <span class="label">C</span>
-  </div>
-
-  <div class="checkpoint" id="checkpoint4">
-    <span class="label">4</span>
-  </div>
-
-  <div class="checkpointFake" id="checkpoint4Fake">
-    <span class="label">4</span>
-  </div>
-
-  <div class="checkpoint" id="checkpointD">
-    <span class="label">D</span>
-  </div>
-
-  <div class="checkpointFake" id="checkpointDFake">
-    <span class="label">D</span>
-  </div>
-
-  <div class="checkpoint" id="checkpoint5">
-    <span class="label">5</span>
-  </div>
-
-  <div class="checkpointFake" id="checkpoint5Fake">
-    <span class="label">5</span>
-  </div>
-
-  <div class="checkpoint" id="checkpointE">
-    <span class="label">E</span>
-  </div>
-
-  <div class="checkpointFake" id="checkpointEFake">
-    <span class="label">E</span>
+  <div class="checkpoint" id="fake">
+    <span class="label" id="fakeText">2</span>
   </div>
 
   <div id="errorModal" class="modal">
@@ -120,7 +63,7 @@
     <div class="modal-content">
       <div class="modal-header">
         <span class="modal-title">Attempt Complete</span>
-        <span class="modal-close" onclick="closeResultsModal()">&times;</span>
+        <span class="modal-close" onclick="closeRestartModal()">&times;</span>
       </div>
       <div class="modal-body" id="resultsModalBodyContent">
         <span class="modal-download">Please repeat the task.</span>

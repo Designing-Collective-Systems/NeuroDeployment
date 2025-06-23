@@ -23,11 +23,13 @@ exports.getLatestResult = async (req, res) => {
 
 exports.getParameters = async (req, res) => {
     try {
-        const resp = await pgClient.query('SELECT * FROM test_parameters ORDER BY id DESC LIMIT 1');
+        const resp = await pgClient.query('SELECT * FROM test_parameters where num_blocks = 2');
 
         if (resp.rows.length === 0) {
             return res.status(404).json({ msg: 'No test parameters found' });
         }
+
+        const row = resp.rows[0];
 
         const obj = {
             fixed_or_rand: row.fixed_or_rand,
@@ -58,7 +60,7 @@ exports.submitResult = async (req, res) => {
             await pgClient.query(
                 'INSERT INTO test_results (participantid, blockno, coordx, coordy, coordt, realpointid, realpointx, realpointy, fakepointid, fakepointx, fakepointy, speed, pausevalue, correctangle, wrongangle, err, errorcorrected) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)',
                 [
-                    data.participantid,
+                    data.participantid[i],
                     data.blockno[i],
                     data.coordx[i],
                     data.coordy[i],
@@ -96,9 +98,9 @@ exports.submitMaxSpeedResult = async (req, res) => {
 
         for (let i = 0; i < data.coordx.length; i++) {
             await pgClient.query(
-                'INSERT INTO max_speed (pid, coordx, coordy, coordt) VALUES ($1, $2, $3, $4)',
+                'INSERT INTO max_speed (participantid, coordx, coordy, coordt) VALUES ($1, $2, $3, $4)',
                 [
-                    data.participantid,
+                    data.participantid[i],
                     data.coordx[i],
                     data.coordy[i],
                     data.coordt[i],
