@@ -32,17 +32,22 @@ Cognition
 ├── database/            # SQL scripts for setting up database tables
 │   ├── measures.sql     # Table definition for measures, test1
 │   ├── users.sql        # Table definition for users
-│   └── query.sql        # test results for participants, test2
+│   └── session.sql      # Table definition for user sessions
+│   └── pairs.sql        # Table definition participant/caregiver pairs
+│   └── test_results.sql # test results for participants, test2
+│   └── test_parameters.sql # test parameters for test2
+│   └── max_speed.sql    # test results for participants on the maxspeed test
 │
 ├── public/              # Front-end files served to users
 │   ├── script/
 │   │   ├── deviation.js         # Script for deviation calculations
 │   │   ├── measures.js          # Script for managing measures
-│   │   ├── test1.js             # Additional test logic
-│   │   └── test2.js             # Additional test logic
+│   │   ├── test1.js             # Motor performance test logic
+│   │   └── test2.js             # Crossroads cognitive test logic
 │   ├── styles/
 │   │   ├── style1.css           # General styles
 │   │   └── style2.css           # Additional styles
+│   │   └── style3.css           # Additional styles
 │   ├── uploads/                 # Directory for file uploads
 │   └── *.html                   # HTML files (index, login, participant, etc.)
 │
@@ -74,12 +79,11 @@ Cognition
 npm install
 ```
 
-3. **Set up the PostgreSQL database:**
-4. **Set up the PostgreSQL database:**
+3. **Set up the PostgreSQL database:** (run all sql files and populate the test_results table and test_parameters table with the corresponding test data found in public/test_data)
 5. **Run on the server:**
 
 ```
-npm run
+npm start
 ```
 
 Open your browser and navigate to http://localhost:8080.
@@ -101,4 +105,10 @@ Open your browser and navigate to http://localhost:8080.
 ### Results
 
 - GET /results/calculateResult
+- GET /results/getParameters
 - POST /results/submitdata
+- POST /results/submitmaxspeeddata
+  
+### Extra notes
+
+- To test different test parameters for test2, change the db query in resultsController.getParameters
