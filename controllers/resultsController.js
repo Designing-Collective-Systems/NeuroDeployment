@@ -23,7 +23,7 @@ exports.getLatestResult = async (req, res) => {
 
 exports.getParameters = async (req, res) => {
     try {
-        const resp = await pgClient.query('SELECT * FROM test_parameters where num_blocks = 2');
+        const resp = await pgClient.query('SELECT * FROM test_parameters where fixed_or_rand = true and num_blocks = 2 LIMIT 1');
 
         if (resp.rows.length === 0) {
             return res.status(404).json({ msg: 'No test parameters found' });

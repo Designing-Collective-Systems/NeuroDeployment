@@ -320,129 +320,126 @@ if (!participantID) {
 		middlex = (window.innerWidth / 2) - nodeRadius;
 		middley = (window.innerHeight / 4) + (window.innerHeight / 2) - nodeRadius;
 		isFixed = params.fixed_or_rand;
-	});
 
-	getIDBlock().then(data => {
-		console.log(data); // Logs the data after the promise is resolved
 
-		blockno = data.blockno;
+		getIDBlock().then(data => {
+			console.log(data); // Logs the data after the promise is resolved
 
-		if (blockno >= blockLimit) {
-			blockno = 0;
-		}
+			blockno = data.blockno;
 
-		// come back to this
-		// for (let pair in [0, 1, 2, 3, 4, 5, 6, 7, 8]) {
-		// 	placePoints(pair); // this generates the locations of all of the points ahead of time
-		// }
-		for (let i = 0; i < 52; i++) {
-			placePoints(i); // this generates the locations of all of the points ahead of time
-		}
-		document.getElementById('origin').style.left = `${middlex}px`;
-		document.getElementById('origin').style.top = `${middley}px`;
-		document.getElementById('origin').style.display = 'flex';
-
-		// At the touch start
-		document.addEventListener("touchstart", e => {
-			if (coords.length == 0) {
-				startTime = Date.now(); // if first touch, set startTime
+			if (blockno >= blockLimit) {
+				blockno = 0;
 			}
 
-			// add point to coords
-			const touch = e.changedTouches[0];
-
-			if (document.elementsFromPoint(touch.pageX, touch.pageY).includes(document.getElementById('origin'))) {
-				trialno++;
-				placeChecks();
-				document.getElementById('real').style.display = 'flex';
-				document.getElementById('fake').style.display = 'flex';
-
-				const pointer = document.getElementById('pointer')
-				pointer.style.display = 'flex';
-				pointer.style.top = `${touch.pageY}px`
-				pointer.style.left = `${touch.pageX}px`
-				pointer.id = "pointer"
-
-				if (error) {
-					error = false;
-				}
-				coords.push([touch.screenX, touch.screenY, currentTime(), checkpointPairsLabel[trialno][0], checkpointPairsCoords[trialno][0][0], checkpointPairsCoords[trialno][0][1],
-				checkpointPairsLabel[trialno][1], checkpointPairsCoords[trialno][1][0], checkpointPairsCoords[trialno][1][1]]);
-				start = 1;
+			for (let i = 0; i < 52; i++) {
+				placePoints(i); // this generates the locations of all of the points ahead of time
 			}
-		});
+			document.getElementById('origin').style.left = `${middlex}px`;
+			document.getElementById('origin').style.top = `${middley}px`;
+			document.getElementById('origin').style.display = 'flex';
 
-		document.addEventListener("touchmove", e => {
-			const touch = e.changedTouches[0];
-
-			const pointer = document.getElementById('pointer')
-			pointer.style.top = `${touch.pageY}px`
-			pointer.style.left = `${touch.pageX}px`
-
-			// Advance trialno if on correct point, show error message if not
-			if (!error && document.elementsFromPoint(touch.pageX, touch.pageY).includes(document.getElementById('real'))) {
-
-				coords.push([touch.screenX, touch.screenY, currentTime(), checkpointPairsLabel[trialno][0], checkpointPairsCoords[trialno][0][0], checkpointPairsCoords[trialno][0][1],
-				checkpointPairsLabel[trialno][1], checkpointPairsCoords[trialno][1][0], checkpointPairsCoords[trialno][1][1]]);
-
-				trialno++;
-				document.getElementById('origin').style.left = document.getElementById('real').style.left;
-				document.getElementById('origin').style.top = document.getElementById('real').style.top;
-				document.getElementById("originText").innerHTML = checkpointPairsLabel[trialno - 1][0];
-				placeChecks();
-
-				if (end === 0 && trialno === trialLimit) {
-					end = 1;
-					endblock();
+			// At the touch start
+			document.addEventListener("touchstart", e => {
+				if (coords.length == 0) {
+					startTime = Date.now(); // if first touch, set startTime
 				}
 
-			} else if (!error && document.elementsFromPoint(touch.pageX, touch.pageY).includes(document.getElementById('fake'))) {
-				coords.push([-2, -2, currentTime(), checkpointPairsLabel[trialno][0], checkpointPairsCoords[trialno][0][0], checkpointPairsCoords[trialno][0][1],
-				checkpointPairsLabel[trialno][1], checkpointPairsCoords[trialno][1][0], checkpointPairsCoords[trialno][1][1]]);
+				// add point to coords
+				const touch = e.changedTouches[0];
 
-				document.getElementById("errorModal").style.display = 'block'; // show error modal
-				document.getElementById('real').style.display = 'none';
-				document.getElementById('fake').style.display = 'none';
-				trialno--; // force user to go back
-				error = true; // set error state
-				start = 0;
-			}
-			else {
-				if (!error) {
+				if (document.elementsFromPoint(touch.pageX, touch.pageY).includes(document.getElementById('origin'))) {
+					trialno++;
+					placeChecks();
+					document.getElementById('real').style.display = 'flex';
+					document.getElementById('fake').style.display = 'flex';
+
+					const pointer = document.getElementById('pointer')
+					pointer.style.display = 'flex';
+					pointer.style.top = `${touch.pageY}px`
+					pointer.style.left = `${touch.pageX}px`
+					pointer.id = "pointer"
+
+					if (error) {
+						error = false;
+					}
 					coords.push([touch.screenX, touch.screenY, currentTime(), checkpointPairsLabel[trialno][0], checkpointPairsCoords[trialno][0][0], checkpointPairsCoords[trialno][0][1],
 					checkpointPairsLabel[trialno][1], checkpointPairsCoords[trialno][1][0], checkpointPairsCoords[trialno][1][1]]);
+					start = 1;
 				}
-			}
-		});
+			});
 
-		document.addEventListener("touchend", e => {
-			// add point to coords
-			const touch = e.changedTouches[0];
+			document.addEventListener("touchmove", e => {
+				const touch = e.changedTouches[0];
 
-			const pointer = document.getElementById('pointer');
-			pointer.style.display = 'none';
+				const pointer = document.getElementById('pointer')
+				pointer.style.top = `${touch.pageY}px`
+				pointer.style.left = `${touch.pageX}px`
 
-			//console.log(currentTime());
+				// Advance trialno if on correct point, show error message if not
+				if (!error && document.elementsFromPoint(touch.pageX, touch.pageY).includes(document.getElementById('real'))) {
 
-			if (end === 0 && document.elementsFromPoint(touch.pageX, touch.pageY).includes(document.getElementById('real')) && trialno === trialLimit) { // if at final point, submit data
-				end = 1;
-				endblock();
-			}
-			else {
-				if (!error && end === 0 && start === 1) {
-
-					coords.push([-1, -1, currentTime(), checkpointPairsLabel[trialno][0], checkpointPairsCoords[trialno][0][0], checkpointPairsCoords[trialno][0][1],
+					coords.push([touch.screenX, touch.screenY, currentTime(), checkpointPairsLabel[trialno][0], checkpointPairsCoords[trialno][0][0], checkpointPairsCoords[trialno][0][1],
 					checkpointPairsLabel[trialno][1], checkpointPairsCoords[trialno][1][0], checkpointPairsCoords[trialno][1][1]]);
 
-					document.getElementById("liftModal").style.display = 'block'; // show error modal
+					trialno++;
+					document.getElementById('origin').style.left = document.getElementById('real').style.left;
+					document.getElementById('origin').style.top = document.getElementById('real').style.top;
+					document.getElementById("originText").innerHTML = checkpointPairsLabel[trialno - 1][0];
+					placeChecks();
+
+					if (end === 0 && trialno === trialLimit) {
+						end = 1;
+						endblock();
+					}
+
+				} else if (!error && document.elementsFromPoint(touch.pageX, touch.pageY).includes(document.getElementById('fake'))) {
+					coords.push([-2, -2, currentTime(), checkpointPairsLabel[trialno][0], checkpointPairsCoords[trialno][0][0], checkpointPairsCoords[trialno][0][1],
+					checkpointPairsLabel[trialno][1], checkpointPairsCoords[trialno][1][0], checkpointPairsCoords[trialno][1][1]]);
+
+					document.getElementById("errorModal").style.display = 'block'; // show error modal
 					document.getElementById('real').style.display = 'none';
 					document.getElementById('fake').style.display = 'none';
-
 					trialno--; // force user to go back
 					error = true; // set error state
 					start = 0;
 				}
-			}
+				else {
+					if (!error) {
+						coords.push([touch.screenX, touch.screenY, currentTime(), checkpointPairsLabel[trialno][0], checkpointPairsCoords[trialno][0][0], checkpointPairsCoords[trialno][0][1],
+						checkpointPairsLabel[trialno][1], checkpointPairsCoords[trialno][1][0], checkpointPairsCoords[trialno][1][1]]);
+					}
+				}
+			});
+
+			document.addEventListener("touchend", e => {
+				// add point to coords
+				const touch = e.changedTouches[0];
+
+				const pointer = document.getElementById('pointer');
+				pointer.style.display = 'none';
+
+				//console.log(currentTime());
+
+				if (end === 0 && document.elementsFromPoint(touch.pageX, touch.pageY).includes(document.getElementById('real')) && trialno === trialLimit) { // if at final point, submit data
+					end = 1;
+					endblock();
+				}
+				else {
+					if (!error && end === 0 && start === 1) {
+
+						coords.push([-1, -1, currentTime(), checkpointPairsLabel[trialno][0], checkpointPairsCoords[trialno][0][0], checkpointPairsCoords[trialno][0][1],
+						checkpointPairsLabel[trialno][1], checkpointPairsCoords[trialno][1][0], checkpointPairsCoords[trialno][1][1]]);
+
+						document.getElementById("liftModal").style.display = 'block'; // show error modal
+						document.getElementById('real').style.display = 'none';
+						document.getElementById('fake').style.display = 'none';
+
+						trialno--; // force user to go back
+						error = true; // set error state
+						start = 0;
+					}
+				}
+			});
 		});
 	});
 }
