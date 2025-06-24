@@ -1,62 +1,87 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Monitor</title>
-    <script src="/socket.io/socket.io.js"></script>
-  </head>
-  <body>
-    <h1>Monitor Panel</h1>
 
-    <input type="text" id="participantUsername" placeholder="Enter participant User Name" />
-    <button id="bindparticipant">Bind participant</button>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Monitor</title>
+  <script src="/socket.io/socket.io.js"></script>
+</head>
 
-    <button id="goButton" disabled>Go</button>
+<body>
+  <button id="logoutButton" style="
+  position: absolute;
+  top: 20px;
+  right: 20px;
+">
+    Logout
+  </button>
 
-    <script>
-      const socket = io();
-      let caregiverId = sessionStorage.getItem('caregiverId');
-      let roomId;
-      window.addEventListener('load', () => {
+  <h1>Monitor Panel</h1>
+
+  <input type="text" id="participantUsername" placeholder="Enter participant User Name" />
+  <button id="bindparticipant">Bind participant</button>
+
+  <button id="goButton" disabled>Go</button>
+
+  <script>
+    const socket = io();
+    let caregiverId = sessionStorage.getItem('caregiverId');
+    let roomId;
+    window.addEventListener('load', () => {
       const caregiverId = sessionStorage.getItem('caregiverId');
       if (!caregiverId) {
-          console.error('No caregiver ID found in sessionStorage');
+        console.error('No caregiver ID found in sessionStorage');
       } else {
-          console.log('Caregiver ID from sessionStorage:', caregiverId);
+        console.log('Caregiver ID from sessionStorage:', caregiverId);
       }
-      });
+    });
 
-      document.getElementById("bindparticipant").addEventListener("click", () => {
-        const participantUsername = document.getElementById("participantUsername").value;
-        if (!participantUsername) {
-          alert("Please enter a participant username.");
-          return;
-        }
-        socket.emit("bindparticipantByUsername", {
-          caregiverId: caregiverId,
-          participantUsername: participantUsername,
-        });
-        console.log("Attempting to bind participant:", participantUsername, "with caregiver:", caregiverId);
+    document.getElementById("bindparticipant").addEventListener("click", () => {
+      const participantUsername = document.getElementById("participantUsername").value;
+      if (!participantUsername) {
+        alert("Please enter a participant username.");
+        return;
+      }
+      socket.emit("bindparticipantByUsername", {
+        caregiverId: caregiverId,
+        participantUsername: participantUsername,
       });
+      console.log("Attempting to bind participant:", participantUsername, "with caregiver:", caregiverId);
+    });
 
-      socket.on("bindingSuccess", (data) => {
-        roomId = data.roomId;
-        console.log("Binding success, room ID:", roomId);
-        document.getElementById("goButton").disabled = false; 
-      });
+    socket.on("bindingSuccess", (data) => {
+      roomId = data.roomId;
+      console.log("Binding success, room ID:", roomId);
+      document.getElementById("goButton").disabled = false;
+    });
 
-      socket.on("bindingError", (error) => {
-        alert("Error binding participant: " + error.msg);
-      });
+    socket.on("bindingError", (error) => {
+      alert("Error binding participant: " + error.msg);
+    });
 
-      document.getElementById("goButton").addEventListener("click", () => {
-        if (roomId) {
-          socket.emit("go", roomId);
-        } else {
-          alert("You need to bind a participant first!");
-        }
-      });
-    </script>
-  </body>
+    document.getElementById("goButton").addEventListener("click", () => {
+      if (roomId) {
+        socket.emit("go", roomId);
+      } else {
+        alert("You need to bind a participant first!");
+      }
+    });
+
+    document.getElementById("logoutButton").addEventListener("click", () => {
+      fetch("/api/logout", {
+        method: "GET",
+        credentials: "include"
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          console.log(data.msg);
+          sessionStorage.clear();
+          window.location.href = "/login.html";
+        })
+        .catch((error) => console.error("Logout error:", error));
+    });
+  </script>
+</body>
+
 </html>

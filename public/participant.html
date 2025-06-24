@@ -1,62 +1,89 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE-edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Cognition Study Instructions Page</title>
-  </head>
-  <body class="text-body">
-    <h1 class="title">Instructions</h1>
-    <ol class="instructions">
-      <li>The aim of this task is to slide your finger from one circle to another.</li>
-      <li>Start the task by placing your finger on the circle with the number 1 in it.</li>
-      <li>Slide your finger from 1 to the circle with the letter A. After this, go to the circle with 2.</li>
-      <li>Continue moving in this pattern – number first, followed by a letter until you complete the task.</li>
-      <li>Do not lift your finger from the screen while performing this task.</li>
-      <li>You will be asked to repeat this task 4 times in total.</li>
-    </ol>
 
-    <!-- <button id="startButton" type="button">Start Test</button> -->
-    <button id="test1Button" disabled>Select Test 1</button>
-    <button id="test2Button" disabled>Select Test 2</button>
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE-edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cognition Study Instructions Page</title>
+</head>
 
-    <script src="/socket.io/socket.io.js"></script>
-    <script>
-      const socket = io();
-      const participantUsername = sessionStorage.getItem('participantUsername');
-      const participantId = sessionStorage.getItem('participantId');
-      console.log(`Received participantUsername: ${participantUsername}`);
-      console.log('Received participant ID stored:', sessionStorage.getItem('participantId'));
-      
-      socket.on('roomCreated', (data) => {
+<body class="text-body">
+
+  <button id="logoutButton" style="
+  position: absolute;
+  top: 20px;
+  right: 20px;
+">
+    Logout
+  </button>
+
+  <h1 class="title">Instructions</h1>
+  <ol class="instructions">
+    <li>The aim of this task is to slide your finger from one circle to another.</li>
+    <li>Start the task by placing your finger on the circle with the number 1 in it.</li>
+    <li>Slide your finger from 1 to the circle with the letter A. After this, go to the circle with 2.</li>
+    <li>Continue moving in this pattern – number first, followed by a letter until you complete the task.</li>
+    <li>Do not lift your finger from the screen while performing this task.</li>
+    <li>You will be asked to repeat this task 4 times in total.</li>
+  </ol>
+
+  <!-- <button id="startButton" type="button">Start Test</button> -->
+  <button id="test1Button" disabled>Select Test 1</button>
+  <button id="test2Button" disabled>Select Test 2</button>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    const socket = io();
+    const participantUsername = sessionStorage.getItem('participantUsername');
+    const participantId = sessionStorage.getItem('participantId');
+    console.log(`Received participantUsername: ${participantUsername}`);
+    console.log('Received participant ID stored:', sessionStorage.getItem('participantId'));
+
+    socket.on('roomCreated', (data) => {
       const { roomId, participantId } = data;
 
       if (sessionStorage.getItem('participantId') === String(participantId)) {
-          console.log('Room created, joining room:', roomId);
-          socket.emit('joinRoom', { roomId });
+        console.log('Room created, joining room:', roomId);
+        socket.emit('joinRoom', { roomId });
       }
-      });
+    });
 
-      socket.on("go", () => {
-        console.log('Received "go" event. Enabling test selection buttons...');
-        document.getElementById("test1Button").disabled = false;
-        document.getElementById("test2Button").disabled = false;
-      });
-      // Function to start Test 1
-      document.getElementById("test1Button").addEventListener("click", () => {
-        socket.emit('startTest', { test: 'test1', participantId: participantId });
-        window.location.href = "/test1.html"; // Navigate to Test 1
-      });
+    socket.on("go", () => {
+      console.log('Received "go" event. Enabling test selection buttons...');
+      document.getElementById("test1Button").disabled = false;
+      document.getElementById("test2Button").disabled = false;
+    });
+    // Function to start Test 1
+    document.getElementById("test1Button").addEventListener("click", () => {
+      socket.emit('startTest', { test: 'test1', participantId: participantId });
+      window.location.href = "/test1.html"; // Navigate to Test 1
+    });
 
-      // Function to start Test 2
-      document.getElementById("test2Button").addEventListener("click", () => {
-        socket.emit('startTest', { test: 'test2', participantId: participantId });
-        window.location.href = "/test2.html"; // Navigate to Test 2
-      });
-      socket.on("roomNotFound", () => {
-        alert("Room not found. Please contact the caregiver.");
-      });
-    </script>
-  </body>
+    // Function to start Test 2
+    document.getElementById("test2Button").addEventListener("click", () => {
+      socket.emit('startTest', { test: 'test2', participantId: participantId });
+      window.location.href = "/test2.html"; // Navigate to Test 2
+    });
+    socket.on("roomNotFound", () => {
+      alert("Room not found. Please contact the caregiver.");
+    });
+
+    document.getElementById("logoutButton").addEventListener("click", () => {
+      fetch("/api/logout", {
+        method: "GET",
+        credentials: "include"
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          console.log(data.msg);
+          sessionStorage.clear();
+          window.location.href = "/login.html";
+        })
+        .catch((error) => console.error("Logout error:", error));
+    });
+
+  </script>
+</body>
+
 </html>
