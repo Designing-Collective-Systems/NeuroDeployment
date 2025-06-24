@@ -1,0 +1,5 @@
+﻿fixed_or_rand,num_blocks,num_trials,node_radius,min_angle
+TRUE,8,10,30,40
+FALSE,4,10,30,40
+TRUE,2,10,30,40
+FALSE,2,10,30,40
