@@ -1,8 +1,13 @@
 const pgClient = require('../db');
 
 exports.getLatestResult = async (req, res) => {
+    const participantId = req.query.participantid;
+
     try {
-        const resp = await pgClient.query('SELECT * FROM test_results ORDER BY id DESC LIMIT 1');
+        const resp = await pgClient.query(
+            'SELECT * FROM test_results WHERE participantid = $1 ORDER BY id DESC LIMIT 1',
+            [participantId]
+        );
 
         if (resp.rows.length === 0) {
 

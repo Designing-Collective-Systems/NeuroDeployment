@@ -37,7 +37,7 @@ const coords = [];
 //let blockno = 1;
 
 const getIDBlock = async function () {
-	const response = await fetch('/api/results/calculateResult');
+	const response = await fetch(`/api/results/calculateResult?participantid=${participantID}`);
 	const data = await response.json(); // Correct way to parse JSON
 	return data;
 }
