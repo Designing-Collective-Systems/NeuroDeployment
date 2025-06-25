@@ -9,6 +9,7 @@ The **Cognition Project** is a web-based application designed to track and analy
 ## Features
 
 - **Motor Performance Metrics**: Capture and calculate various touch event metrics such as drag speed, distance, acceleration, and tap duration.
+- **Cognitive Performance Metrics**: Capture performance of crossroads task through fine finger tracking.
 - **User Roles**: Two distinct roles—participants and caregivers—each with specific permissions and functionality.
 - **API Integration**: RESTful API for creating, retrieving, and updating users, measurements, and results.
 - **Database Storage**: Persistent storage using PostgreSQL for all user and measurement data.
