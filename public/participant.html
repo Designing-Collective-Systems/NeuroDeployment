@@ -19,14 +19,20 @@
   </button>
 
   <h1 class="title">Instructions</h1>
-  <ol class="instructions">
-    <li>The aim of this task is to slide your finger from one circle to another.</li>
-    <li>Start the task by placing your finger on the circle with the number 1 in it.</li>
-    <li>Slide your finger from 1 to the circle with the letter A. After this, go to the circle with 2.</li>
-    <li>Continue moving in this pattern – number first, followed by a letter until you complete the task.</li>
-    <li>Do not lift your finger from the screen while performing this task.</li>
-    <li>You will be asked to repeat this task 4 times in total.</li>
-  </ol>
+
+  <h2>Test 1 Instructions</h2>
+  <p>For test 1, slide your finger from the start point to the target point as quickly and efficiently as you
+    can.</p>
+  <p>You will be asked to repeat this task several times.</p>
+  <p></p>
+  <h2>Test 2 Instructions</h2>
+  <p>For test 2, the task is to slide your finger from one circle to another.</p>
+  <p>Start the task by placing your finger on the circle with the number 1 in it.</p>
+  <p>Slide your finger from 1 to the circle with the letter A. After this, go to the circle with 2.</p>
+  <p>Continue moving in this pattern – number first, followed by a letter until you complete the task.</p>
+  <p>Do not lift your finger from the screen while performing this task.</p>
+  <p>You will be asked to repeat this task several times.</p>
+
 
   <!-- <button id="startButton" type="button">Start Test</button> -->
   <button id="test1Button" disabled>Select Test 1</button>
@@ -65,6 +71,7 @@
       socket.emit('startTest', { test: 'test2', participantId: participantId });
       window.location.href = "/test2.html"; // Navigate to Test 2
     });
+
     socket.on("roomNotFound", () => {
       alert("Room not found. Please contact the caregiver.");
     });

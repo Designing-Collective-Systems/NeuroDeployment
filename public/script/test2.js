@@ -38,12 +38,21 @@ const coords = [];
 
 const getIDBlock = async function () {
 	const response = await fetch(`/api/results/calculateResult?participantid=${participantID}`);
-	const data = await response.json(); // Correct way to parse JSON
+	const data = await response.json();
+	console.log(data);
+
+	// if no results exist yet for the participant
+	if (!data.success) {
+		console.log("No test results for participant yet, setting blockno to 0");
+		return { blockno: 0 };
+	}
+
 	return data;
 }
 
 const getParameters = async function () {
 	const response = await fetch('/api/results/getParameters');
+
 	const data = await response.json();
 	console.log(data);
 	return data;
@@ -323,11 +332,10 @@ if (!participantID) {
 
 
 		getIDBlock().then(data => {
-			console.log(data); // Logs the data after the promise is resolved
-
 			blockno = data.blockno;
 
 			if (blockno >= blockLimit) {
+				console.log("already reached blockLimit, resetting blockno to 0");
 				blockno = 0;
 			}
 

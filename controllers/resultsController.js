@@ -10,18 +10,17 @@ exports.getLatestResult = async (req, res) => {
         );
 
         if (resp.rows.length === 0) {
-
-            return res.status(404).json({ msg: 'No test results found' });
+            return res.status(200).json({ success: false, msg: 'No test results found' });
         }
 
         const obj = {
-            participantid: resp.rows[0].participantid,
+            success: true,
             blockno: resp.rows[0].blockno,
         };
         res.json(obj);
     } catch (error) {
         console.error('Error retrieving test results:', error);
-        res.status(500).json({ msg: 'Error retrieving test results' });
+        res.status(500).json({ success: false, msg: 'Error retrieving test results' });
     }
 };
 
