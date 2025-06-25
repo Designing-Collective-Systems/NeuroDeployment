@@ -2,7 +2,7 @@
 
 ## Overview
 
-The **Cognition Project** is a web-based application designed to track and analyze motor performance through touch interactions. It features user authentication, role-based access (participants and caregivers), and a RESTful API for handling measurements and results. The data is stored in a PostgreSQL database and the system uses Node.js with Express as the back-end framework.
+The **Cognition Project** is a web-based application designed to track and analyze motor and cognitive performance through touch interactions. It features user authentication, role-based access (participants and caregivers), and a RESTful API for handling measurements and results. The data is stored in a PostgreSQL database and the system uses Node.js with Express as the back-end framework.
 
 ---
 
