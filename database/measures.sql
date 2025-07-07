@@ -1,3 +1,5 @@
+CREATE SEQUENCE IF NOT EXISTS measures_id_seq;
+
 CREATE TABLE IF NOT EXISTS public.measures
 (
     id integer NOT NULL DEFAULT nextval('measures_id_seq'::regclass),
