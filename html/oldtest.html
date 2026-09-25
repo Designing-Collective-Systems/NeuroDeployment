@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE-edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="style.css" rel="stylesheet" />
+  <link rel="shortcut icon" href="">
+  <title>Touch Events Example</title>
+  <script src="measures.js" defer> </script>
+  <script src="oldtest.js" defer> </script>
+</head>
+
+<body>
+
+  <div class="checkpoint" id="checkpoint1">
+    <span class="label">1</span>
+  </div>
+
+  <div class="checkpoint" id="checkpointA">
+    <span class="label">A</span>
+  </div>
+
+  <div class="checkpoint" id="checkpoint2">
+    <span class="label">2</span>
+  </div>
+
+  <div class="checkpointFake" id="checkpoint2Fake">
+    <span class="label">2</span>
+  </div>
+
+  <div class="checkpoint" id="checkpointB">
+    <span class="label">B</span>
+  </div>
+
+  <div class="checkpointFake" id="checkpointBFake">
+    <span class="label">B</span>
+  </div>
+
+  <div class="checkpoint" id="checkpoint3">
+    <span class="label">3</span>
+  </div>
+
+  <div class="checkpointFake" id="checkpoint3Fake">
+    <span class="label">3</span>
+  </div>
+
+  <div class="checkpoint" id="checkpointC">
+    <span class="label">C</span>
+  </div>
+
+  <div class="checkpointFake" id="checkpointCFake">
+    <span class="label">C</span>
+  </div>
+
+  <div class="checkpoint" id="checkpoint4">
+    <span class="label">4</span>
+  </div>
+
+  <div class="checkpointFake" id="checkpoint4Fake">
+    <span class="label">4</span>
+  </div>
+
+  <div class="checkpoint" id="checkpointD">
+    <span class="label">D</span>
+  </div>
+
+  <div class="checkpointFake" id="checkpointDFake">
+    <span class="label">D</span>
+  </div>
+
+  <div class="checkpoint" id="checkpoint5">
+    <span class="label">5</span>
+  </div>
+
+  <div class="checkpointFake" id="checkpoint5Fake">
+    <span class="label">5</span>
+  </div>
+
+  <div class="checkpoint" id="checkpointE">
+    <span class="label">E</span>
+  </div>
+
+  <div class="checkpointFake" id="checkpointEFake">
+    <span class="label">E</span>
+  </div>
+
+  <div id="errorModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <span class="modal-title">Incorrect Point</span>
+        <span class="modal-close" onclick="closeErrorModal()">&times;</span>
+      </div>
+      <div class="modal-body" id="errorModalBodyContent">
+        <span class="modal-download">Incorrect Point, go back to the last point and try again</span>
+      </div>
+      <div class="modal-footer">
+        <button onclick="closeErrorModal()">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="liftModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <span class="modal-title">Finger Lifted</span>
+        <span class="modal-close" onclick="closeErrorModal()">&times;</span>
+      </div>
+      <div class="modal-body" id="errorModalBodyContent">
+        <span class="modal-download">Finger lifted, go back to the last point and try again</span>
+      </div>
+      <div class="modal-footer">
+        <button onclick="closeErrorModal()">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="restartsModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <span class="modal-title">Attempt Complete</span>
+        <span class="modal-close" onclick="closeResultsModal()">&times;</span>
+      </div>
+      <div class="modal-body" id="resultsModalBodyContent">
+        <span class="modal-download">Please repeat the task.</span>
+      </div>
+      <div class="modal-footer">
+        <button onclick="closeRestartModal()">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="resultsModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <span class="modal-title">Done!</span>
+        <span class="modal-close" onclick="closeResultsModal()">&times;</span>
+      </div>
+      <div class="modal-body" id="resultsModalBodyContent">
+        <span class="modal-download">You have successfully completed the task</span>
+      </div>
+      <div class="modal-footer">
+        <button onclick="closeResultsModal()">Close</button>
+      </div>
+    </div>
+  </div>
+</body>
+
+</html>
