@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex">
+    <link href="admin.css" rel="stylesheet" />
+    <link rel="icon" href="data:,">
+    <title>Crossroads Admin</title>
+    <script src="layout.js" defer></script>
+    <script src="charts.js" defer></script>
+    <script src="admin.js" defer></script>
+</head>
+
+<body>
+    <!-- Login -->
+    <main id="view-login" class="login" hidden>
+        <form class="card login-card" id="login-form">
+            <h1>Crossroads admin</h1>
+            <label for="login-password">Password</label>
+            <input type="password" id="login-password" autocomplete="current-password" required autofocus>
+            <p class="form-error" id="login-error" role="alert"></p>
+            <button type="submit" class="btn btn-primary">Log in</button>
+        </form>
+    </main>
+
+    <!-- App -->
+    <div id="view-app" hidden>
+        <header class="topbar">
+            <strong class="brand">Crossroads admin</strong>
+            <nav class="tabs" aria-label="Sections">
+                <a href="#participants" data-tab="participants">Participants</a>
+                <a href="#settings" data-tab="settings">Tasks &amp; settings</a>
+                <a href="#session" data-tab="session">Start a session</a>
+            </nav>
+            <button class="btn btn-ghost" id="logout">Log out</button>
+        </header>
+
+        <main class="content">
+            <!-- Participants list -->
+            <section id="tab-participants" hidden>
+                <div class="toolbar">
+                    <h1>Participants</h1>
+                    <input type="search" id="pid-filter" placeholder="Filter by ID" aria-label="Filter by participant ID">
+                    <button class="btn" id="refresh-participants">Refresh</button>
+                    <span class="spacer"></span>
+                    <span class="muted">Export all:</span>
+                    <a class="btn" href="/api/admin/export.csv?table=test_results">Crossroads CSV</a>
+                    <a class="btn" href="/api/admin/export.csv?table=max_speed">Swiping CSV</a>
+                    <a class="btn" href="/api/admin/export.csv?table=sessions">Sessions CSV</a>
+                </div>
+                <div class="table-wrap">
+                    <table class="data">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Sessions</th>
+                                <th>Finished</th>
+                                <th class="num">A rounds</th>
+                                <th class="num">B rounds</th>
+                                <th class="num">Swiping</th>
+                                <th class="num">Wrong-dot errors</th>
+                                <th>Last activity</th>
+                            </tr>
+                        </thead>
+                        <tbody id="participants-body"></tbody>
+                    </table>
+                </div>
+                <p class="muted" id="participants-empty" hidden>No results yet.</p>
+            </section>
+
+            <!-- Participant detail -->
+            <section id="tab-participant" hidden>
+                <div class="toolbar">
+                    <a href="#participants" class="btn btn-ghost">← All participants</a>
+                    <h1 id="p-title">Participant</h1>
+                    <label class="inline">Session
+                        <select id="p-session"></select>
+                    </label>
+                    <span class="spacer"></span>
+                    <a class="btn" id="p-export-tmt">Crossroads CSV</a>
+                    <a class="btn" id="p-export-swipe">Swiping CSV</a>
+                </div>
+
+                <div class="tiles" id="p-tiles"></div>
+
+                <div class="grid-2">
+                    <article class="card">
+                        <h2>Round completion time</h2>
+                        <p class="sub">Seconds from first touch on dot 1 to reaching the last dot, per round.</p>
+                        <div class="chart" id="chart-times"></div>
+                    </article>
+                    <article class="card">
+                        <h2>Errors per round</h2>
+                        <p class="sub">Wrong-dot touches and finger lifts, per round.</p>
+                        <div class="chart" id="chart-errors"></div>
+                    </article>
+                </div>
+
+                <article class="card">
+                    <div class="card-head">
+                        <h2>Finger path</h2>
+                        <label class="inline">Task
+                            <select id="traj-task">
+                                <option value="tmt_a">Crossroads-A</option>
+                                <option value="tmt_b">Crossroads-B</option>
+                            </select>
+                        </label>
+                        <label class="inline">Round <select id="traj-block"></select></label>
+                    </div>
+                    <p class="sub">The recorded path on the participant's screen. Black dots are the correct targets in
+                        order; hollow dots are the distractors that were shown.</p>
+                    <div class="traj" id="chart-traj"></div>
+                </article>
+
+                <article class="card">
+                    <h2>Swiping speed</h2>
+                    <p class="sub">Finger speed over time, averaged in 100 ms windows. Gaps are finger lifts.</p>
+                    <div class="chart" id="chart-swipe"></div>
+                </article>
+
+                <article class="card">
+                    <h2>All rounds</h2>
+                    <div class="table-wrap">
+                        <table class="data">
+                            <thead>
+                                <tr>
+                                    <th>Task</th>
+                                    <th class="num">Round</th>
+                                    <th class="num">Time (s)</th>
+                                    <th class="num">Wrong-dot</th>
+                                    <th class="num">Lifts</th>
+                                    <th class="num">Off-course samples</th>
+                                    <th class="num">Samples</th>
+                                    <th>Recorded</th>
+                                    <th>Session</th>
+                                </tr>
+                            </thead>
+                            <tbody id="p-blocks"></tbody>
+                        </table>
+                    </div>
+                </article>
+
+                <article class="card danger">
+                    <h2>Delete this participant's data</h2>
+                    <p class="sub">Permanently removes every Crossroads, swiping and session row for this ID. Type the
+                        participant ID to confirm.</p>
+                    <div class="row">
+                        <input type="text" id="p-delete-confirm" inputmode="numeric" aria-label="Type the participant ID to confirm">
+                        <button class="btn btn-danger" id="p-delete" disabled>Delete data</button>
+                    </div>
+                </article>
+            </section>
+
+            <!-- Settings -->
+            <section id="tab-settings" hidden>
+                <div class="toolbar">
+                    <h1>Tasks &amp; settings</h1>
+                    <span class="spacer"></span>
+                    <span class="save-status" id="settings-status" role="status"></span>
+                    <button class="btn" id="settings-reset">Reset to defaults</button>
+                    <button class="btn btn-primary" id="settings-save">Save changes</button>
+                </div>
+                <p class="sub">Changes apply to sessions started after you save. Tasks always run in this order:
+                    Crossroads-A, Crossroads-B, then swiping.</p>
+
+                <form id="settings-form" class="settings" autocomplete="off">
+                    <fieldset class="card">
+                        <legend>Task 1 · Crossroads-A (numbers only)</legend>
+                        <label class="switch"><input type="checkbox" name="tasks.tmt_a.enabled"> Include this task</label>
+                        <label>Rounds (blocks) <input type="number" name="tasks.tmt_a.blocks" min="1" max="20"></label>
+                        <label>Moves per round <input type="number" name="tasks.tmt_a.trialsPerBlock" min="2" max="50"></label>
+                        <label class="switch"><input type="checkbox" name="tasks.tmt_a.showDistractor"> Show a distractor dot
+                            (labelled with the number after the correct one), matching B</label>
+                        <p class="hint" id="hint-a-blocks" hidden>Design guidance: use at least 3 rounds of A to get a
+                            variability estimate.</p>
+                    </fieldset>
+
+                    <fieldset class="card">
+                        <legend>Task 2 · Crossroads-B (numbers and letters)</legend>
+                        <label class="switch"><input type="checkbox" name="tasks.tmt_b.enabled"> Include this task</label>
+                        <label>Rounds (blocks) <input type="number" name="tasks.tmt_b.blocks" min="1" max="20"></label>
+                        <label>Moves per round <input type="number" name="tasks.tmt_b.trialsPerBlock" min="2" max="50"></label>
+                        <p class="hint" id="hint-moves" hidden>A and B have different moves per round, so their
+                            completion times can no longer be subtracted round by round.</p>
+                    </fieldset>
+
+                    <fieldset class="card">
+                        <legend>Task 3 · Swiping</legend>
+                        <label class="switch"><input type="checkbox" name="tasks.swipe.enabled"> Include this task</label>
+                        <label>Duration (seconds) <input type="number" name="tasks.swipe.durationSec" min="3" max="120"></label>
+                        <label class="switch"><input type="checkbox" name="tasks.swipe.pauseOnLift"> Pause the timer while
+                            the finger is lifted</label>
+                    </fieldset>
+
+                    <fieldset class="card">
+                        <legend>Layout</legend>
+                        <label>Task area
+                            <select name="layout.area">
+                                <option value="bottom">Bottom of the screen (prompt at top)</option>
+                                <option value="top">Top of the screen (prompt at bottom)</option>
+                                <option value="full">Full screen (original layout)</option>
+                            </select>
+                        </label>
+                        <label>Task area height (% of screen) <input type="number" name="layout.areaHeightPct" min="30" max="100"></label>
+                        <label>Dot diameter (px) <input type="number" name="layout.nodeDiameter" min="40" max="160"></label>
+                        <p class="hint">The original layout is scaled by the same factor horizontally and vertically, so
+                            relative distances and angles between dots are unchanged.</p>
+                    </fieldset>
+
+                    <fieldset class="card">
+                        <legend>Guidance</legend>
+                        <label class="switch"><input type="checkbox" name="guidance.showDemo"> Show the demonstration
+                            animation before each task</label>
+                        <label class="switch"><input type="checkbox" name="guidance.showPrompts"> Show on-screen prompts during
+                            the task ("Place your finger on dot 1 to begin")</label>
+                    </fieldset>
+
+                    <fieldset class="card preview-card">
+                        <legend>Layout preview</legend>
+                        <label>Device
+                            <select id="preview-device">
+                                <option value="820x1180">iPad Air, portrait (820 × 1180)</option>
+                                <option value="1180x820">iPad Air, landscape (1180 × 820)</option>
+                                <option value="768x1024">iPad, portrait (768 × 1024)</option>
+                                <option value="390x844">Phone (390 × 844)</option>
+                            </select>
+                        </label>
+                        <div class="preview" id="layout-preview"></div>
+                        <p class="hint" id="preview-info"></p>
+                    </fieldset>
+                </form>
+            </section>
+
+            <!-- Start a session -->
+            <section id="tab-session" hidden>
+                <div class="toolbar">
+                    <h1>Start a session</h1>
+                </div>
+                <article class="card narrow">
+                    <p>Open the participant view on the study device. Leave the ID empty to assign the next free
+                        participant ID automatically.</p>
+                    <label>Participant ID (optional) <input type="number" id="session-pid" min="0" placeholder="Automatic"></label>
+                    <label>Link <input type="text" id="session-link" readonly></label>
+                    <div class="row">
+                        <a class="btn btn-primary" id="session-open" target="_blank" rel="noopener">Open participant view</a>
+                        <button class="btn" id="session-copy">Copy link</button>
+                        <span class="save-status" id="session-status" role="status"></span>
+                    </div>
+                </article>
+            </section>
+        </main>
+    </div>
+
+    <div class="tooltip" id="tooltip" hidden></div>
+</body>
+
+</html>

@@ -1,79 +1,52 @@
-var prevcoord;
-var index = 0;
-var errorstate = 0;
-var preverror = 0;
-const circleradius = 40;
+// Per-sample measures for the Crossroads tasks.
+// Same algorithm as the original measures.js, but without global state so it can
+// be run once per block without reloading the page.
+//
+// coord = [x, y, t, realLabel, realX, realY, fakeLabel, fakeX, fakeY]
+// realX/realY/fakeX/fakeY are the TOP-LEFT corner of the node (original data format),
+// so the node centre is (x + radius, y + radius).
+(function (global) {
+    'use strict';
 
-function speed(coord) {
-    return Math.sqrt(Math.pow((coord[0] - prevcoord[0]), 2) + Math.pow((coord[1] - prevcoord[1]), 2)) / (coord[2] - prevcoord[2]);
-}
+    function calculateMeasures(coords, radius) {
+        const out = { speed: [], pause: [], correctangle: [], wrongangle: [], error: [], errorcorrected: [] };
+        let prev = null;
+        let errorstate = 0;
+        let preverror = 0;
 
-function correctangle(coord) {
-    var AB = Math.sqrt(Math.pow(prevcoord[0] - coord[0], 2) + Math.pow(prevcoord[1] - coord[1], 2));
-    var BC = Math.sqrt(Math.pow(prevcoord[0] - (coord[4] + circleradius), 2) + Math.pow(prevcoord[1] - (coord[5] + circleradius), 2));
-    var AC = Math.sqrt(Math.pow((coord[4] + circleradius) - coord[0], 2) + Math.pow((coord[5] + circleradius) - coord[1], 2));
-    const angle = Math.acos((BC * BC + AB * AB - AC * AC) / (2 * BC * AB));
-    return (angle * 180) / Math.PI;
-}
+        const angleTo = (prev, coord, nx, ny) => {
+            const AB = Math.hypot(prev[0] - coord[0], prev[1] - coord[1]);
+            const BC = Math.hypot(prev[0] - (nx + radius), prev[1] - (ny + radius));
+            const AC = Math.hypot((nx + radius) - coord[0], (ny + radius) - coord[1]);
+            return (Math.acos((BC * BC + AB * AB - AC * AC) / (2 * BC * AB)) * 180) / Math.PI;
+        };
+        const zeros = () => {
+            out.speed.push(0); out.pause.push(0); out.correctangle.push(0);
+            out.wrongangle.push(0); out.error.push(0); out.errorcorrected.push(0);
+        };
 
-function wrongangle(coord) {
-    var AB = Math.sqrt(Math.pow(prevcoord[0] - coord[0], 2) + Math.pow(prevcoord[1] - coord[1], 2));
-    var BC = Math.sqrt(Math.pow(prevcoord[0] - (coord[7] + circleradius), 2) + Math.pow(prevcoord[1] - (coord[8] + circleradius), 2));
-    var AC = Math.sqrt(Math.pow((coord[7] + circleradius) - coord[0], 2) + Math.pow((coord[8] + circleradius) - coord[1], 2));
-    const angle = Math.acos((BC * BC + AB * AB - AC * AC) / (2 * BC * AB));
-    return (angle * 180) / Math.PI;
-}
-
-function calculate_measures(coords, data) {
-    //console.log(coords);
-    for (const coord of coords) {
-        //console.log(coord[3]);
-        if (index === 0 || errorstate === 1) {
-            data.speed.push(0);
-            data.pause.push(0);
-            data.correctangle.push(0);
-            data.wrongangle.push(0);
-            data.error.push(0);
-            data.errorcorrected.push(0);
-            errorstate = 0;
-        }
-        else if (coord[0] === -1 || coord[0] === -2) {
-            errorstate = 1;
-            data.speed.push(0);
-            data.pause.push(0);
-            data.correctangle.push(0);
-            data.wrongangle.push(0);
-            data.error.push(0);
-            data.errorcorrected.push(0);
-        }
-        else {
-            //console.log("hello");
-            data.speed.push(speed(coord));
-            //console.log(speed(coord));
-            data.pause.push(coord[2] - prevcoord[2]);
-            const cangle = correctangle(coord);
-            const wangle = wrongangle(coord);
-            data.correctangle.push(cangle);
-            data.wrongangle.push(wangle);
-            if (preverror === 1 && cangle <= wangle) {
-                data.errorcorrected.push(1)
+        coords.forEach((coord, index) => {
+            if (index === 0 || errorstate === 1) {
+                zeros();
+                errorstate = 0;
+            } else if (coord[0] === -1 || coord[0] === -2) {
+                errorstate = 1;
+                zeros();
+            } else {
+                out.speed.push(Math.hypot(coord[0] - prev[0], coord[1] - prev[1]) / (coord[2] - prev[2]));
+                out.pause.push(coord[2] - prev[2]);
+                const cangle = angleTo(prev, coord, coord[4], coord[5]);
+                const wangle = angleTo(prev, coord, coord[7], coord[8]);
+                out.correctangle.push(cangle);
+                out.wrongangle.push(wangle);
+                out.errorcorrected.push(preverror === 1 && cangle <= wangle ? 1 : 0);
+                if (cangle > wangle) { out.error.push(1); preverror = 1; }
+                else { out.error.push(0); preverror = 0; }
             }
-            else {
-                data.errorcorrected.push(0)
-            }
-            if (cangle > wangle) {
-                data.error.push(1);
-                preverror = 1;
-            }
-            else {
-                data.error.push(0);
-                preverror = 0;
-            }
-        }
-        index = index + 1;
-        prevcoord = coord;
-        //console.log(coord);
+            prev = coord;
+        });
+        return out;
     }
 
-    return data;
-}
+    global.calculateMeasures = calculateMeasures;
+})(typeof window !== 'undefined' ? window : globalThis);
