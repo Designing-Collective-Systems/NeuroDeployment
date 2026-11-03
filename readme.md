@@ -20,6 +20,7 @@ Colours mean the same thing everywhere: **blue** = button to continue, **red** =
 ## Admin panel (`/admin`)
 
 - Turn tasks on/off; set rounds, moves per round, swipe duration, layout, dot size, demo and prompts
+- Move the dots: drag them on a device preview or type their pixel coordinates. Positions are saved relative to the screen size, so they adapt to other devices and to the task-area setting. A and B always share them.
 - Per participant: summary (mean A/B time, B − A, B ÷ A, errors, lifts, swipe speed), plots, the finger path for every round, and a table of rounds
 - CSV export (all participants or one); delete a participant's data
 - "Start a session" builds a link such as `/?pid=12` to run a specific participant ID. Without one, the next free ID is assigned.

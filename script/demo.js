@@ -257,7 +257,7 @@
         const loop = now => {
             if (size.w > 0) {
                 const caption = frame(ctx, size, now - t0);
-                if (caption !== lastCaption) { captionEl.textContent = caption; lastCaption = caption; }
+                if (captionEl && caption !== lastCaption) { captionEl.textContent = caption; lastCaption = caption; }
             }
             raf = requestAnimationFrame(loop);
         };

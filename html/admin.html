@@ -10,6 +10,7 @@
     <title>Crossroads Admin</title>
     <script src="layout.js" defer></script>
     <script src="charts.js" defer></script>
+    <script src="positions.js" defer></script>
     <script src="admin.js" defer></script>
 </head>
 
@@ -217,17 +218,52 @@
                             the task ("Place your finger on dot 1 to begin")</label>
                     </fieldset>
 
-                    <fieldset class="card preview-card">
-                        <legend>Layout preview</legend>
-                        <label>Device
-                            <select id="preview-device">
-                                <option value="820x1180">iPad Air, portrait (820 × 1180)</option>
-                                <option value="1180x820">iPad Air, landscape (1180 × 820)</option>
-                                <option value="768x1024">iPad, portrait (768 × 1024)</option>
-                                <option value="390x844">Phone (390 × 844)</option>
-                            </select>
-                        </label>
-                        <div class="preview" id="layout-preview"></div>
+                    <fieldset class="card positions-card">
+                        <legend>Dot positions</legend>
+                        <div class="row">
+                            <label class="inline">Device
+                                <select id="preview-device">
+                                    <option value="820x1180">iPad Air, portrait (820 × 1180)</option>
+                                    <option value="1180x820">iPad Air, landscape (1180 × 820)</option>
+                                    <option value="768x1024">iPad, portrait (768 × 1024)</option>
+                                    <option value="390x844">Phone (390 × 844)</option>
+                                </select>
+                            </label>
+                            <label class="inline">Labels
+                                <select id="pos-labels">
+                                    <option value="tmt_b">Crossroads-B (1, A, 2 …)</option>
+                                    <option value="tmt_a">Crossroads-A (1, 2, 3 …)</option>
+                                </select>
+                            </label>
+                            <label class="inline">Show <select id="pos-move"></select></label>
+                            <span class="spacer"></span>
+                            <button type="button" class="btn" id="pos-reset">Reset to original positions</button>
+                        </div>
+                        <p class="hint">Drag a dot with the mouse, or type its coordinates. Coordinates are the centre of
+                            the dot in pixels from the top-left of the selected device's screen, after the task-area
+                            setting is applied, so they change when you change the device or task area. A and B share
+                            these positions; only the labels differ. Black = target, hollow = distractor. Dots from different moves
+                            can sit on top of each other (they are never on screen together); choose "Move N only" under
+                            Show to grab the right one.</p>
+                        <div class="positions-editor">
+                            <div class="preview" id="layout-preview"></div>
+                            <div class="table-wrap pos-table-wrap">
+                                <table class="data pos-table">
+                                    <thead>
+                                        <tr>
+                                            <th></th>
+                                            <th>Target</th>
+                                            <th class="num">x</th>
+                                            <th class="num">y</th>
+                                            <th>Distractor</th>
+                                            <th class="num">x</th>
+                                            <th class="num">y</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="pos-body"></tbody>
+                                </table>
+                            </div>
+                        </div>
                         <p class="hint" id="preview-info"></p>
                     </fieldset>
                 </form>

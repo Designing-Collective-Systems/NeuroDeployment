@@ -43,24 +43,41 @@
         return [sequenceLabel(task, i + 1), sequenceLabel(task, i + 2)];
     }
 
+    // Default (original) positions in the stored format:
+    //   origin: centre of the start dot, % of screen width/height
+    //   pairs:  [[real], [fake]] per move, TOP-LEFT of an 80px dot, % of screen width/height
+    function defaultPositions() {
+        return { origin: [ORIGIN.x * 100, ORIGIN.y * 100], pairs: POSITIONS.map(p => [[...p[0]], [...p[1]]]) };
+    }
+
+    // Use custom positions only if they have the expected shape.
+    function resolvePositions(positions) {
+        const ok = positions && Array.isArray(positions.origin) && Array.isArray(positions.pairs) &&
+            positions.pairs.length === POSITIONS.length;
+        return ok ? positions : defaultPositions();
+    }
+
     // Build the screen geometry for a W x H viewport.
     // layout = { area: 'bottom' | 'top' | 'full', areaHeightPct, nodeDiameter }
-    // The original full-screen layout is scaled UNIFORMLY (same factor on x and y)
-    // into the task area, so relative distances, angles and positions are preserved.
-    function build(W, H, layout) {
+    // positions = optional custom positions (see defaultPositions); null = original layout.
+    // The full-screen layout is scaled UNIFORMLY (same factor on x and y) into the task area,
+    // so relative distances, angles and positions are preserved. The scale is fitted to the
+    // ORIGINAL layout's extent, so moving individual dots never rescales the others.
+    function build(W, H, layout, positions) {
+        const pos = resolvePositions(positions);
         const area = layout.area || 'bottom';
         const r = (layout.nodeDiameter || 80) / 2;
 
         // Node centres in the original, full-screen coordinate system.
         const origCentre = (p) => ({ x: (p[0] / 100) * W + ORIGINAL_RADIUS, y: (p[1] / 100) * H + ORIGINAL_RADIUS });
-        const originCentre = { x: ORIGIN.x * W, y: ORIGIN.y * H };
+        const originCentre = { x: (pos.origin[0] / 100) * W, y: (pos.origin[1] / 100) * H };
 
         let s = 1, tx = 0, ty = 0, areaTop = 0, areaHeight = H;
         if (area !== 'full') {
             areaHeight = H * Math.min(100, Math.max(20, layout.areaHeightPct || 60)) / 100;
             areaTop = area === 'top' ? 0 : H - areaHeight;
 
-            let minX = originCentre.x, maxX = originCentre.x, minY = originCentre.y, maxY = originCentre.y;
+            let minX = ORIGIN.x * W, maxX = minX, minY = ORIGIN.y * H, maxY = minY;
             for (const pair of POSITIONS) {
                 for (const p of pair) {
                     const c = origCentre(p);
@@ -74,16 +91,33 @@
             ty = areaTop + areaHeight / 2 - s * (minY + maxY) / 2;
         }
 
-        const map = (c) => ({ x: tx + s * c.x, y: ty + s * c.y });
+        // Keep every dot fully inside the task area (only matters for custom positions
+        // that were placed on a different screen shape).
+        const bounds = { x0: r, x1: W - r, y0: areaTop + r, y1: areaTop + areaHeight - r };
+        const clamp = (c) => ({
+            x: Math.min(bounds.x1, Math.max(bounds.x0, c.x)),
+            y: Math.min(bounds.y1, Math.max(bounds.y0, c.y)),
+        });
+        const map = (c) => clamp({ x: tx + s * c.x, y: ty + s * c.y });
+
+        // Inverse: an on-screen centre -> stored value (used by the admin position editor).
+        const unmap = (x, y) => ({ x: (x - tx) / s, y: (y - ty) / s });
+        const round = v => Math.round(v * 100) / 100;
+        const toStoredOrigin = (x, y) => { const c = unmap(x, y); return [round(c.x / W * 100), round(c.y / H * 100)]; };
+        const toStoredNode = (x, y) => {
+            const c = unmap(x, y);
+            return [round((c.x - ORIGINAL_RADIUS) / W * 100), round((c.y - ORIGINAL_RADIUS) / H * 100)];
+        };
 
         return {
-            W, H, r, scale: s, area, areaTop, areaHeight,
+            W, H, r, scale: s, area, areaTop, areaHeight, bounds,
             origin: map(originCentre),
             // centre of the correct (real) / distractor (fake) node for trial i
-            real: (i) => map(origCentre(POSITIONS[i][0])),
-            fake: (i) => map(origCentre(POSITIONS[i][1])),
+            real: (i) => map(origCentre(pos.pairs[i][0])),
+            fake: (i) => map(origCentre(pos.pairs[i][1])),
+            toStoredOrigin, toStoredNode,
         };
     }
 
-    global.TMTLayout = { POSITIONS, ORIGIN, ORIGINAL_RADIUS, MAX_TRIALS, sequenceLabel, trialLabels, build };
+    global.TMTLayout = { POSITIONS, ORIGIN, ORIGINAL_RADIUS, MAX_TRIALS, sequenceLabel, trialLabels, defaultPositions, build };
 })(typeof window !== 'undefined' ? window : globalThis);

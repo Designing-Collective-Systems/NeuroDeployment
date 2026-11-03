@@ -180,9 +180,20 @@ table.data a { color: var(--accent); font-weight: 600; }
 .settings label.switch { display: flex; align-items: flex-start; gap: 0.5rem; color: var(--text-primary); }
 .settings label.switch input { margin-top: 0.2rem; width: 1.05rem; height: 1.05rem; flex: none; }
 .settings .hint[id^=hint-] { color: #8a5300; background: #fff7e6; border-radius: 6px; padding: 0.4rem 0.6rem; }
-.preview-card { grid-row: span 2; }
+.positions-card { grid-column: 1 / -1; }
+.positions-editor { display: grid; grid-template-columns: minmax(18rem, 1fr) auto; gap: 1rem; align-items: start; }
+@media (max-width: 900px) { .positions-editor { grid-template-columns: 1fr; } }
 .preview { display: grid; place-items: center; }
-.preview svg { width: 100%; max-height: 32rem; height: auto; }
+.preview svg { width: 100%; max-height: 44rem; height: auto; touch-action: none; user-select: none; }
+.pos-node:not(.faint) { cursor: grab; }
+.preview svg.dragging, .preview svg.dragging .pos-node { cursor: grabbing; }
+.pos-node.faint { opacity: 0.12; pointer-events: none; }
+.pos-table-wrap { max-height: 44rem; overflow: auto; }
+.pos-table th[scope=row] { color: var(--text-secondary); font-weight: 600; background: none; position: static; }
+.pos-table td { padding: 0.25rem 0.4rem; }
+.pos-table input { width: 4.6rem; min-height: 30px; padding: 0.2rem 0.4rem; text-align: right; font-variant-numeric: tabular-nums; }
+.pos-table tr.selected { background: #eff4ff; }
+#preview-info.warn { color: #8a5300; background: #fff7e6; border-radius: 6px; padding: 0.4rem 0.6rem; }
 .save-status { color: var(--text-secondary); }
 .save-status.ok { color: #0a6b0a; }
 .save-status.err { color: var(--danger); }

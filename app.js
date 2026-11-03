@@ -5,6 +5,8 @@ const fs = require('node:fs');
 const path = require('node:path');
 const crypto = require('node:crypto');
 const pg = require('pg');
+require('./script/layout.js'); // shared with the browser; defines globalThis.TMTLayout
+const TMTLayout = globalThis.TMTLayout;
 
 const port = process.env.PORT || 8080;
 
@@ -86,6 +88,8 @@ const DEFAULT_CONFIG = {
 	},
 	layout: { area: 'bottom', areaHeightPct: 60, nodeDiameter: 80 },
 	guidance: { showDemo: true, showPrompts: true },
+	// Dot positions; null = the original fixed layout (see script/layout.js).
+	positions: null,
 };
 
 const clampInt = (v, min, max, fallback) => {
@@ -93,6 +97,22 @@ const clampInt = (v, min, max, fallback) => {
 	return Number.isFinite(n) ? Math.min(max, Math.max(min, n)) : fallback;
 };
 const bool = (v, fallback) => (typeof v === 'boolean' ? v : fallback);
+
+// Custom dot positions, stored as % of screen width/height (see script/layout.js).
+function sanitizePositions(p) {
+	if (!p || typeof p !== 'object' || !Array.isArray(p.pairs) || p.pairs.length !== TMTLayout.POSITIONS.length) return null;
+	const n = v => {
+		const x = Number(v);
+		return Number.isFinite(x) ? Math.min(150, Math.max(-50, Math.round(x * 100) / 100)) : null;
+	};
+	const pt = a => (Array.isArray(a) && a.length === 2 && n(a[0]) !== null && n(a[1]) !== null ? [n(a[0]), n(a[1])] : null);
+	const origin = pt(p.origin);
+	const pairs = p.pairs.map(pair => (Array.isArray(pair) ? [pt(pair[0]), pt(pair[1])] : [null, null]));
+	if (!origin || pairs.some(pair => !pair[0] || !pair[1])) return null;
+	// Identical to the original layout -> store null so future default changes still apply.
+	if (JSON.stringify({ origin, pairs }) === JSON.stringify(TMTLayout.defaultPositions())) return null;
+	return { origin, pairs };
+}
 
 function sanitizeConfig(input) {
 	const d = DEFAULT_CONFIG;
@@ -128,6 +148,7 @@ function sanitizeConfig(input) {
 			showDemo: bool(g.showDemo, d.guidance.showDemo),
 			showPrompts: bool(g.showPrompts, d.guidance.showPrompts),
 		},
+		positions: sanitizePositions(i.positions),
 	};
 }
 
@@ -236,6 +257,7 @@ const STATIC = {
 	'/demo.js': ['script/demo.js', 'application/javascript; charset=utf-8'],
 	'/participant.js': ['script/participant.js', 'application/javascript; charset=utf-8'],
 	'/charts.js': ['script/charts.js', 'application/javascript; charset=utf-8'],
+	'/positions.js': ['script/positions.js', 'application/javascript; charset=utf-8'],
 	'/admin.js': ['script/admin.js', 'application/javascript; charset=utf-8'],
 };
 

@@ -145,7 +145,7 @@
         $('overview-count').textContent = n === 1 ? '1 task' : `${n} tasks`;
         $('overview-next').hidden = n === 0;
         if (n === 0) {
-            list.innerHTML = '<li class="notice notice-error">No tasks are switched on. Please ask the researcher.</li>';
+            // list.innerHTML = '<li class="notice notice-error">No tasks are switched on. Please ask the researcher.</li>';
         }
         show('screen-overview');
     }
@@ -267,7 +267,7 @@
 
         let geo, r;
         function applyGeometry() {
-            geo = L.build(window.innerWidth, window.innerHeight, state.config.layout);
+            geo = L.build(window.innerWidth, window.innerHeight, state.config.layout, state.config.positions);
             r = geo.r;
             // The prompt sits right next to the task area, the progress chip at the screen edge.
             bar.className = 'task-bar ' + (geo.area === 'bottom' ? 'at-top' : geo.area === 'top' ? 'at-bottom' : 'overlay');

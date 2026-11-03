@@ -364,7 +364,7 @@
     });
 
     // --------------------------------------------------------------- settings
-    let defaults = null, maxTrials = 50;
+    let defaults = null;
     const form = $('settings-form');
     const get = (obj, path) => path.split('.').reduce((o, k) => (o ? o[k] : undefined), obj);
     function set(obj, path, v) {
@@ -381,6 +381,7 @@
             if (input.type === 'checkbox') input.checked = !!v;
             else input.value = v;
         }
+        positionEditor.setPositions(cfg.positions);
         onFormChange(false);
     }
 
@@ -393,6 +394,19 @@
         return cfg;
     }
 
+    // Dot positions editor (script/positions.js). Settings come from the form above.
+    const positionEditor = window.PositionEditor.create({
+        host: $('layout-preview'),
+        tableBody: $('pos-body'),
+        info: $('preview-info'),
+        device: $('preview-device'),
+        labels: $('pos-labels'),
+        move: $('pos-move'),
+        getSettings: readForm,
+        onChange: () => setStatus('settings-status', 'Unsaved changes'),
+    });
+    const settingsToSave = () => ({ ...readForm(), positions: positionEditor.getPositions() });
+
     function setStatus(id, text, kind) {
         const s = $(id);
         s.textContent = text;
@@ -404,31 +418,14 @@
         $('hint-a-blocks').hidden = !(cfg.tasks.tmt_a.enabled && cfg.tasks.tmt_a.blocks < 3);
         $('hint-moves').hidden = cfg.tasks.tmt_a.trialsPerBlock === cfg.tasks.tmt_b.trialsPerBlock;
         form.elements['layout.areaHeightPct'].disabled = cfg.layout.area === 'full';
-        renderPreview(cfg);
+        positionEditor.render();
         if (dirty) setStatus('settings-status', 'Unsaved changes');
-    }
-
-    function renderPreview(cfg) {
-        const [W, H] = $('preview-device').value.split('x').map(Number);
-        const trials = Math.min(maxTrials, cfg.tasks.tmt_b.trialsPerBlock || 10);
-        const g = C.layoutPreview($('layout-preview'), W, H, cfg.layout, trials, 'tmt_b');
-        // smallest edge-to-edge gap between dots that are on screen together
-        let gap = Infinity, origin = g.origin;
-        const d = (p, q) => Math.hypot(p.x - q.x, p.y - q.y) - 2 * g.r;
-        for (let i = 0; i < trials; i++) {
-            const a = g.real(i), b = g.fake(i);
-            gap = Math.min(gap, d(origin, a), d(origin, b), d(a, b));
-            origin = a;
-        }
-        const info = `Layout scaled to ${Math.round(g.scale * 100)}% of the original. Closest dots on screen together: ${Math.round(gap)} px apart (edge to edge).`;
-        $('preview-info').textContent = gap < 10 ? `${info} Dots touch or overlap on this screen: use a taller task area or smaller dots.` : info;
     }
 
     async function loadSettings() {
         try {
             const data = await api('/api/admin/config');
             defaults = data.defaults;
-            maxTrials = data.maxTrials;
             fillForm(data.config);
             setStatus('settings-status', '');
         } catch (err) {
@@ -436,14 +433,15 @@
         }
     }
 
-    form.addEventListener('input', () => onFormChange(true));
+    // only named controls are settings; the position table and preview selects handle themselves
+    form.addEventListener('input', e => { if (e.target.name) onFormChange(true); });
     form.addEventListener('submit', e => e.preventDefault());
-    $('preview-device').addEventListener('change', () => renderPreview(readForm()));
+    $('pos-reset').addEventListener('click', () => positionEditor.resetPositions());
     $('settings-reset').addEventListener('click', () => { if (defaults) { fillForm(defaults); setStatus('settings-status', 'Defaults loaded, not saved yet'); } });
     $('settings-save').addEventListener('click', async () => {
         setStatus('settings-status', 'Saving…');
         try {
-            const { config } = await api('/api/admin/config', { method: 'PUT', body: readForm() });
+            const { config } = await api('/api/admin/config', { method: 'PUT', body: settingsToSave() });
             fillForm(config);
             setStatus('settings-status', 'Saved', 'ok');
         } catch (err) {

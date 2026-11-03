@@ -346,32 +346,5 @@
         }
     }
 
-    // ---- layout preview (settings tab) -----------------------------------------
-    function layoutPreview(container, W, H, layout, trials, task) {
-        container.replaceChildren();
-        const g = global.TMTLayout.build(W, H, layout);
-        const svg = el('svg', { viewBox: `0 0 ${W} ${H}`, role: 'img', 'aria-label': 'Layout preview' }, container);
-        el('rect', { x: 0, y: 0, width: W, height: H, rx: 24, fill: '#fff', stroke: '#c9c8c3', 'stroke-width': 4 }, svg);
-        if (layout.area !== 'full') {
-            el('rect', { x: 6, y: g.areaTop, width: W - 12, height: g.areaHeight, rx: 18, fill: '#f3f6fd' }, svg);
-            const ty = layout.area === 'bottom' ? Math.min(g.areaTop / 2, 80) : g.areaTop + g.areaHeight + (H - g.areaHeight) / 2;
-            const t = el('text', { x: W / 2, y: ty, 'text-anchor': 'middle', 'dominant-baseline': 'middle', 'font-size': Math.max(16, W / 26), 'font-weight': 700, fill: '#1d4ed8' }, svg);
-            t.textContent = 'Place your finger on dot 1 to begin';
-        }
-        const pts = [g.origin];
-        for (let i = 0; i < trials; i++) pts.push(g.real(i));
-        el('polyline', { points: pts.map(p => `${p.x},${p.y}`).join(' '), fill: 'none', stroke: '#2a78d6', 'stroke-width': 3, 'stroke-dasharray': '2 8', 'stroke-linecap': 'round' }, svg);
-        for (let i = 0; i < trials; i++) {
-            const f = g.fake(i);
-            el('circle', { cx: f.x, cy: f.y, r: g.r, fill: 'none', stroke: '#bdbcb6', 'stroke-width': 3 }, svg);
-        }
-        pts.forEach((p, i) => {
-            el('circle', { cx: p.x, cy: p.y, r: g.r, fill: '#000', opacity: i === 0 ? 1 : 0.8 }, svg);
-            const t = el('text', { x: p.x, y: p.y, 'text-anchor': 'middle', 'dominant-baseline': 'central', 'font-size': g.r * 0.6, fill: '#fff' }, svg);
-            t.textContent = global.TMTLayout.sequenceLabel(task, i);
-        });
-        return g;
-    }
-
-    global.Charts = { lineChart, groupedBars, trajectory, layoutPreview, fmt };
+    global.Charts = { lineChart, groupedBars, trajectory, fmt };
 })(window);
