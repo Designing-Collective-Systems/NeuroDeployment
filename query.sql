@@ -27,6 +27,7 @@ CREATE TABLE test_results
     screen_h integer,
     node_radius double precision,
     created_at timestamptz,
+    hand text,                -- 'left' (layout was mirrored), 'right', or null if not asked
     PRIMARY KEY (id)
 );
 
@@ -41,6 +42,7 @@ CREATE TABLE max_speed
     screen_w integer,
     screen_h integer,
     created_at timestamptz,
+    hand text,
     PRIMARY KEY (id)
 );
 
@@ -53,7 +55,8 @@ CREATE TABLE sessions
     config jsonb,             -- task settings in effect for this session
     user_agent text,
     screen_w integer,
-    screen_h integer
+    screen_h integer,
+    hand text                 -- 'left' | 'right' | null
 );
 
 CREATE TABLE submissions      -- de-duplicates retried uploads

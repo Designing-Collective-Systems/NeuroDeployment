@@ -20,6 +20,8 @@ Colours mean the same thing everywhere: **blue** = button to continue, **red** =
 ## Admin panel (`/admin`)
 
 - Turn tasks on/off; set rounds, moves per round, swipe duration, layout, dot size, demo and prompts
+- Hand question (on by default): participants say which hand they'll use, and left-handed participants see the dot layout mirrored left-right. A session link can also set the hand (`/?pid=12&hand=left`). The hand is stored with each session and on every result row.
+- Occlusion-safe presets in the dot editor: every target and distractor in moves 1–10 stays outside the area a right hand and forearm cover (below/right of the fingertip), with matched distances, 45–73° separation and counterbalanced sides. One preset is for a 60% task area and a more varied one is for 85%.
 - Move the dots: drag them on a device preview or type their pixel coordinates. Positions are saved relative to the screen size, so they adapt to other devices and to the task-area setting. A and B always share them.
 - Per participant: summary (mean A/B time, B − A, B ÷ A, errors, lifts, swipe speed), plots, the finger path for every round, and a table of rounds
 - CSV export (all participants or one); delete a participant's data

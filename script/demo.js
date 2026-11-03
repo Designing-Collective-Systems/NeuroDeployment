@@ -67,7 +67,8 @@
         ctx.globalAlpha = 1;
     }
 
-    function drawFinger(ctx, x, y, pressed, scale) {
+    // mirror = true draws a left hand
+    function drawFinger(ctx, x, y, pressed, scale, mirror) {
         if (pressed) {
             ctx.beginPath();
             ctx.arc(x, y, 12 * scale, 0, Math.PI * 2);
@@ -77,7 +78,7 @@
         // simple pointing hand: finger + palm, fingertip at (x, y)
         ctx.save();
         ctx.translate(x, y);
-        ctx.scale(scale, scale);
+        ctx.scale(mirror ? -scale : scale, scale);
         ctx.globalAlpha = 0.92;
         ctx.fillStyle = '#f2c9a0';
         ctx.strokeStyle = '#8a5a35';
@@ -110,7 +111,8 @@
     }
 
     // ----- Crossroads (A or B) -----
-    function crossroads(task, showDistractor) {
+    // mirror = true: layout flipped left-right and a left hand, as a left-handed participant will see it
+    function crossroads(task, showDistractor, mirror) {
         const label = k => global.TMTLayout.sequenceLabel(task, k);
         const APPROACH = 1500, PRESS = 900, SLIDE = 1300, SETTLE = 700, END = 2200;
         const STEP = SLIDE + SETTLE;
@@ -118,7 +120,7 @@
 
         return function frame(ctx, size, t) {
             t = t % total;
-            const P = p => ({ x: p.x * size.w, y: p.y * size.h });
+            const P = p => ({ x: (mirror ? 1 - p.x : p.x) * size.w, y: p.y * size.h });
             const r = Math.max(14, Math.min(size.w, size.h) * 0.065);
             const fs = Math.max(0.6, Math.min(1.2, size.w / 420));
 
@@ -129,7 +131,7 @@
 
             if (t < APPROACH) {
                 const k = easeInOut(t / APPROACH);
-                finger = { x: lerp(size.w * 0.92, current.x, k), y: lerp(size.h * 1.15, current.y, k) };
+                finger = { x: lerp(size.w * (mirror ? 0.08 : 0.92), current.x, k), y: lerp(size.h * 1.15, current.y, k) };
                 caption = `Place your finger on dot ${label(0)}`;
             } else if (t < APPROACH + PRESS) {
                 finger = current; pressed = true; pairVisible = t > APPROACH + 250;
@@ -180,11 +182,12 @@
             const onStep = Math.min(step, DEMO_STEPS.length - 1);
             if (pairVisible && step < DEMO_STEPS.length) {
                 const s = DEMO_STEPS[onStep];
-                drawNode(ctx, s.real.x * size.w, s.real.y * size.h, r, label(onStep + 1));
-                if (showDistractor) drawNode(ctx, s.fake.x * size.w, s.fake.y * size.h, r, label(onStep + 2));
+                const pr = P(s.real), pf = P(s.fake);
+                drawNode(ctx, pr.x, pr.y, r, label(onStep + 1));
+                if (showDistractor) drawNode(ctx, pf.x, pf.y, r, label(onStep + 2));
             }
             drawNode(ctx, current.x, current.y, r, currentLabel, { pulse: !pressed && t < APPROACH + PRESS });
-            drawFinger(ctx, finger.x, finger.y, pressed, fs);
+            drawFinger(ctx, finger.x, finger.y, pressed, fs, mirror);
 
             if (t > total - END + 500) drawBanner(ctx, size, '✓ Round complete');
             return caption;
@@ -192,7 +195,7 @@
     }
 
     // ----- Swiping -----
-    function swiping(durationSec) {
+    function swiping(durationSec, mirror) {
         const APPROACH = 1200, COUNT = Math.min(durationSec, 6), SWIPE = COUNT * 1000, END = 1800;
         const total = APPROACH + SWIPE + END;
         const history = [];
@@ -206,7 +209,7 @@
             if (t < APPROACH) {
                 history.length = 0;
                 const k = easeInOut(t / APPROACH);
-                finger = { x: lerp(size.w * 0.95, centre.x, k), y: lerp(size.h * 1.15, centre.y, k) };
+                finger = { x: lerp(size.w * (mirror ? 0.05 : 0.95), centre.x, k), y: lerp(size.h * 1.15, centre.y, k) };
                 caption = 'Place your finger on the screen to start the timer';
             } else if (t < APPROACH + SWIPE) {
                 const s = (t - APPROACH) / 1000;
@@ -242,7 +245,7 @@
                 ctx.lineTo(history[i].x, history[i].y);
                 ctx.stroke();
             }
-            drawFinger(ctx, finger.x, finger.y, pressed, fs);
+            drawFinger(ctx, finger.x, finger.y, pressed, fs, mirror);
             if (t > APPROACH + SWIPE + 300) drawBanner(ctx, size, '✓ Done!');
             return caption;
         };
@@ -251,7 +254,7 @@
     // Public: start an animation; returns a stop function.
     function start(canvas, captionEl, opts) {
         const { ctx, size, stop: stopResize } = setupCanvas(canvas);
-        const frame = opts.task === 'swipe' ? swiping(opts.durationSec || 10) : crossroads(opts.task, opts.showDistractor !== false);
+        const frame = opts.task === 'swipe' ? swiping(opts.durationSec || 10, !!opts.mirror) : crossroads(opts.task, opts.showDistractor !== false, !!opts.mirror);
         const t0 = performance.now();
         let raf = 0, lastCaption = '';
         const loop = now => {

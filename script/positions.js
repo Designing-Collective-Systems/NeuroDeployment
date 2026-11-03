@@ -17,7 +17,7 @@
     }
     const clone = p => JSON.parse(JSON.stringify(p));
 
-    // opts: { host, tableBody, info, device, labels, move, getSettings, onChange }
+    // opts: { host, tableBody, info, device, labels, move, hand, getSettings, onChange }
     function create(opts) {
         let positions = L.defaultPositions();
         let geo = null, trials = 10, selected = null, dragging = null, tableKey = '';
@@ -44,7 +44,7 @@
         function computeGeometry() {
             const s = opts.getSettings();
             const [W, H] = opts.device.value.split('x').map(Number);
-            geo = L.build(W, H, s.layout, positions);
+            geo = L.build(W, H, s.layout, positions, { mirror: opts.hand.value === 'left' });
             const counts = ['tmt_a', 'tmt_b'].filter(t => s.tasks[t].enabled).map(t => s.tasks[t].trialsPerBlock);
             trials = Math.min(L.MAX_TRIALS, Math.max(1, ...(counts.length ? counts : [s.tasks.tmt_b.trialsPerBlock])));
         }
@@ -263,12 +263,15 @@
         opts.device.addEventListener('change', render);
         opts.labels.addEventListener('change', render);
         opts.move.addEventListener('change', render);
+        opts.hand.addEventListener('change', render);
 
         return {
             render,
             setPositions(p) { positions = p ? clone(p) : L.defaultPositions(); selected = null; },
             getPositions() { return clone(positions); },
             resetPositions() { positions = L.defaultPositions(); selected = null; render(); opts.onChange(); },
+            // the caller sets the preset's task area first; this then re-renders with it
+            loadPreset(name) { positions = L.presetPositions(name); selected = null; render(); opts.onChange(); },
         };
     }
 

@@ -14,6 +14,9 @@
 
     const $ = id => document.getElementById(id);
     let urlPid = new URLSearchParams(location.search).get('pid');
+    // ?hand=left|right (from the admin "Start a session" link) skips the hand question
+    let urlHand = ['left', 'right'].includes(new URLSearchParams(location.search).get('hand'))
+        ? new URLSearchParams(location.search).get('hand') : null;
 
     let state = null;      // { sessionId, pid, config, plan, stage, taskIdx, blockIdx, finished }
     let stopDemo = null;
@@ -114,12 +117,12 @@
         const r = await fetch('/api/session', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ pid: urlPid, screen: { w: window.innerWidth, h: window.innerHeight } }),
+            body: JSON.stringify({ pid: urlPid, hand: urlHand, screen: { w: window.innerWidth, h: window.innerHeight } }),
         });
         if (!r.ok) throw new Error(`HTTP ${r.status}`);
         const data = await r.json();
         const plan = ORDER.filter(t => data.config.tasks[t].enabled);
-        state = { sessionId: data.sessionId, pid: data.pid, config: data.config, plan, stage: 'intro', taskIdx: 0, blockIdx: 0, finished: false };
+        state = { sessionId: data.sessionId, pid: data.pid, hand: urlHand, config: data.config, plan, stage: 'intro', taskIdx: 0, blockIdx: 0, finished: false };
         saveState();
     }
 
@@ -181,6 +184,7 @@
                 task,
                 showDistractor: task !== 'tmt_a' || taskCfg('tmt_a').showDistractor,
                 durationSec: taskCfg('swipe').durationSec,
+                mirror: mirrored(),
             });
         }
     }
@@ -267,7 +271,7 @@
 
         let geo, r;
         function applyGeometry() {
-            geo = L.build(window.innerWidth, window.innerHeight, state.config.layout, state.config.positions);
+            geo = L.build(window.innerWidth, window.innerHeight, state.config.layout, state.config.positions, { mirror: mirrored() });
             r = geo.r;
             // The prompt sits right next to the task area, the progress chip at the screen edge.
             bar.className = 'task-bar ' + (geo.area === 'bottom' ? 'at-top' : geo.area === 'top' ? 'at-bottom' : 'overlay');
@@ -529,20 +533,41 @@
     }
 
     // ------------------------------------------------------------------ wiring
+    // ------------------------------------------------------------ hand question
+    // Left-handed participants see the dot layout mirrored left-right, so the hand and
+    // forearm cover the same (empty) part of the screen for everyone.
+    const mirrored = () => state && state.hand === 'left';
+    const askHand = () => state.config.guidance.askHand && !urlHand;
+
+    function afterSession() {
+        if (askHand() && !state.hand) showHand();
+        else showOverview();
+    }
+    function showHand() { show('screen-hand'); }
+    function chooseHand(hand) {
+        state.hand = hand;
+        saveState();
+        enqueue('/api/session/hand', { sessionId: state.sessionId, hand });
+        showOverview();
+    }
+
     async function start() {
         show('screen-loading');
         try {
             await ensureSession();
-            showOverview();
+            afterSession();
         } catch (err) {
             console.error(err);
             show('screen-offline');
         }
     }
 
-    onPress($('welcome-next'), () => (state && state.sessionId ? showOverview() : start()));
+    onPress($('welcome-next'), () => (state && state.sessionId ? afterSession() : start()));
     onPress($('retry-connect'), start);
-    onPress($('overview-back'), showWelcome);
+    onPress($('overview-back'), () => (askHand() ? showHand() : showWelcome()));
+    onPress($('hand-left'), () => chooseHand('left'));
+    onPress($('hand-right'), () => chooseHand('right'));
+    onPress($('hand-back'), showWelcome);
     onPress($('overview-next'), () => {
         if (!state.plan.length) return;
         state.stage = 'tasks';
@@ -557,7 +582,7 @@
     onPress($('thanks-restart'), () => {
         clearState();
         // A ?pid= link belongs to one participant; the next person gets a new ID.
-        if (urlPid !== null) { urlPid = null; history.replaceState(null, '', '/'); }
+        if (urlPid !== null || urlHand !== null) { urlPid = null; urlHand = null; history.replaceState(null, '', '/'); }
         showWelcome();
     });
     onPress($('dialog-error-ok'), () => { $('dialog-error').hidden = true; errorDialogClosed(); });

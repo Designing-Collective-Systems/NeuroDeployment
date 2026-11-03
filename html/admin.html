@@ -58,6 +58,7 @@
                                 <th>ID</th>
                                 <th>Sessions</th>
                                 <th>Finished</th>
+                                <th>Hand</th>
                                 <th class="num">A rounds</th>
                                 <th class="num">B rounds</th>
                                 <th class="num">Swiping</th>
@@ -216,6 +217,9 @@
                             animation before each task</label>
                         <label class="switch"><input type="checkbox" name="guidance.showPrompts"> Show on-screen prompts during
                             the task ("Place your finger on dot 1 to begin")</label>
+                        <label class="switch"><input type="checkbox" name="guidance.askHand"> Ask participants which hand
+                            they will use. Left-handed participants then see the dot layout mirrored left-right, so their
+                            hand covers the same empty part of the screen as a right hand does.</label>
                     </fieldset>
 
                     <fieldset class="card positions-card">
@@ -236,7 +240,18 @@
                                 </select>
                             </label>
                             <label class="inline">Show <select id="pos-move"></select></label>
+                            <label class="inline">Preview for
+                                <select id="pos-hand">
+                                    <option value="right">Right hand</option>
+                                    <option value="left">Left hand (mirrored)</option>
+                                </select>
+                            </label>
                             <span class="spacer"></span>
+                            <select id="pos-preset-name" aria-label="Layout preset">
+                                <option value="occlusionSafe60">Occlusion-safe (task area 60%)</option>
+                                <option value="occlusionSafe85">Occlusion-safe, more varied (task area 85%)</option>
+                            </select>
+                            <button type="button" class="btn" id="pos-preset">Load</button>
                             <button type="button" class="btn" id="pos-reset">Reset to original positions</button>
                         </div>
                         <p class="hint">Drag a dot with the mouse, or type its coordinates. Coordinates are the centre of
@@ -245,6 +260,13 @@
                             these positions; only the labels differ. Black = target, hollow = distractor. Dots from different moves
                             can sit on top of each other (they are never on screen together); choose "Move N only" under
                             Show to grab the right one.</p>
+                        <p class="hint">The occlusion-safe presets place every target and distractor of moves 1–10
+                            outside the area a right hand and forearm cover (below and to the right of the fingertip),
+                            at equal distances and 45–73° apart, with the target on each side of the distractor in 5 of
+                            10 moves. Left-handed participants get them mirrored. Designed for an iPad in portrait; each
+                            preset also sets the task-area height it was designed for. The 60% version has to revisit
+                            similar spots; the 85% version spreads the dots out more. Moves 11 and later keep the
+                            original positions.</p>
                         <div class="positions-editor">
                             <div class="preview" id="layout-preview"></div>
                             <div class="table-wrap pos-table-wrap">
@@ -278,6 +300,13 @@
                     <p>Open the participant view on the study device. Leave the ID empty to assign the next free
                         participant ID automatically.</p>
                     <label>Participant ID (optional) <input type="number" id="session-pid" min="0" placeholder="Automatic"></label>
+                    <label>Hand
+                        <select id="session-hand">
+                            <option value="">Ask the participant (if switched on in settings)</option>
+                            <option value="right">Right hand (don't ask)</option>
+                            <option value="left">Left hand (don't ask; layout mirrored)</option>
+                        </select>
+                    </label>
                     <label>Link <input type="text" id="session-link" readonly></label>
                     <div class="row">
                         <a class="btn btn-primary" id="session-open" target="_blank" rel="noopener">Open participant view</a>

@@ -75,6 +75,7 @@
     // ----------------------------------------------------- participants list
     let participants = [];
     const when = v => (v ? new Date(v).toLocaleString() : '–');
+    const handName = h => (h === 'left' ? 'Left' : h === 'right' ? 'Right' : '–');
 
     async function loadParticipants() {
         try {
@@ -98,11 +99,11 @@
                 () => { const a = document.createElement('a'); a.href = `#participant/${p.pid}`; a.textContent = p.pid; return a; },
                 p.sessions,
                 () => { const s = document.createElement('span'); s.className = `pill ${p.completed ? 'ok' : 'no'}`; s.textContent = p.completed ? 'Yes' : p.sessions ? 'No' : '–'; return s; },
-                p.tmt_a, p.tmt_b, p.swipe, p.wrong, when(p.last),
+                handName(p.hand), p.tmt_a, p.tmt_b, p.swipe, p.wrong, when(p.last),
             ];
             cells.forEach((c, i) => {
                 const td = document.createElement('td');
-                if (i >= 3 && i <= 6) td.className = 'num';
+                if (i >= 4 && i <= 7) td.className = 'num';
                 if (typeof c === 'function') td.appendChild(c()); else td.textContent = c;
                 tr.appendChild(td);
             });
@@ -149,7 +150,7 @@
             o.value = k;
             const s = detail.sessions.find(x => x.id === k);
             o.textContent = k === LEGACY ? 'Before sessions (legacy data)'
-                : `${when(s && s.started_at)}${s && s.completed_at ? ' · finished' : ''}${hasData(k) ? '' : ' · no data'}`;
+                : `${when(s && s.started_at)}${s && s.hand ? ` · ${s.hand} hand` : ''}${s && s.completed_at ? ' · finished' : ''}${hasData(k) ? '' : ' · no data'}`;
             sel.appendChild(o);
         }
         sel.value = ordered.find(hasData) || ordered[0] || '';
@@ -234,6 +235,8 @@
             tile('Finger lifts', `${sum(A, 'lifts')} / ${sum(B, 'lifts')}`, 'A / B, total'),
             tile('Swiping mean speed', f(sw.mean, ' px/s', 0), swipeRows.length ? `${f(sw.activeSec, ' s')} on screen · ${sw.lifts} lifts` : 'No swiping data'),
             tile('Swiping peak speed', f(sw.peak, ' px/s', 0), 'Fastest 100 ms window'),
+            tile('Hand used', handName((detail.sessions.find(x => x.id === $('p-session').value) || {}).hand),
+                'Left = dot layout was mirrored'),
         );
 
         const blue = color('--series-a'), orange = color('--series-b');
@@ -402,6 +405,7 @@
         device: $('preview-device'),
         labels: $('pos-labels'),
         move: $('pos-move'),
+        hand: $('pos-hand'),
         getSettings: readForm,
         onChange: () => setStatus('settings-status', 'Unsaved changes'),
     });
@@ -437,6 +441,15 @@
     form.addEventListener('input', e => { if (e.target.name) onFormChange(true); });
     form.addEventListener('submit', e => e.preventDefault());
     $('pos-reset').addEventListener('click', () => positionEditor.resetPositions());
+    $('pos-preset').addEventListener('click', () => {
+        const name = $('pos-preset-name').value;
+        const preset = window.TMTLayout.PRESETS[name];
+        // a preset only fits the task-area height it was designed for
+        form.elements['layout.area'].value = preset.layout.area;
+        form.elements['layout.areaHeightPct'].value = preset.layout.areaHeightPct;
+        onFormChange(true);
+        positionEditor.loadPreset(name);
+    });
     $('settings-reset').addEventListener('click', () => { if (defaults) { fillForm(defaults); setStatus('settings-status', 'Defaults loaded, not saved yet'); } });
     $('settings-save').addEventListener('click', async () => {
         setStatus('settings-status', 'Saving…');
@@ -451,12 +464,16 @@
 
     // ------------------------------------------------------- start a session
     function updateSessionLink() {
+        const params = new URLSearchParams();
         const pid = $('session-pid').value.trim();
-        const link = `${location.origin}/${pid ? `?pid=${encodeURIComponent(pid)}` : ''}`;
+        if (pid) params.set('pid', pid);
+        if ($('session-hand').value) params.set('hand', $('session-hand').value);
+        const link = `${location.origin}/${params.toString() ? `?${params}` : ''}`;
         $('session-link').value = link;
         $('session-open').href = link;
     }
     $('session-pid').addEventListener('input', updateSessionLink);
+    $('session-hand').addEventListener('change', updateSessionLink);
     $('session-copy').addEventListener('click', async () => {
         try {
             await navigator.clipboard.writeText($('session-link').value);

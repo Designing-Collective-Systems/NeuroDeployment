@@ -87,7 +87,8 @@ const DEFAULT_CONFIG = {
 		swipe: { enabled: true, durationSec: 10, pauseOnLift: true },
 	},
 	layout: { area: 'bottom', areaHeightPct: 60, nodeDiameter: 80 },
-	guidance: { showDemo: true, showPrompts: true },
+	// askHand: ask which hand the participant will use; left-handed participants see the dot layout mirrored.
+	guidance: { showDemo: true, showPrompts: true, askHand: true },
 	// Dot positions; null = the original fixed layout (see script/layout.js).
 	positions: null,
 };
@@ -147,6 +148,7 @@ function sanitizeConfig(input) {
 		guidance: {
 			showDemo: bool(g.showDemo, d.guidance.showDemo),
 			showPrompts: bool(g.showPrompts, d.guidance.showPrompts),
+			askHand: bool(g.askHand, d.guidance.askHand),
 		},
 		positions: sanitizePositions(i.positions),
 	};
@@ -184,6 +186,7 @@ async function initDb() {
 		ALTER TABLE test_results ADD COLUMN IF NOT EXISTS screen_h integer;
 		ALTER TABLE test_results ADD COLUMN IF NOT EXISTS node_radius double precision;
 		ALTER TABLE test_results ADD COLUMN IF NOT EXISTS created_at timestamptz;
+		ALTER TABLE test_results ADD COLUMN IF NOT EXISTS hand text;
 		CREATE INDEX IF NOT EXISTS test_results_pid_idx ON test_results (pid);
 
 		CREATE TABLE IF NOT EXISTS max_speed (
@@ -193,6 +196,7 @@ async function initDb() {
 		ALTER TABLE max_speed ADD COLUMN IF NOT EXISTS screen_w integer;
 		ALTER TABLE max_speed ADD COLUMN IF NOT EXISTS screen_h integer;
 		ALTER TABLE max_speed ADD COLUMN IF NOT EXISTS created_at timestamptz;
+		ALTER TABLE max_speed ADD COLUMN IF NOT EXISTS hand text;
 		CREATE INDEX IF NOT EXISTS max_speed_pid_idx ON max_speed (pid);
 
 		CREATE TABLE IF NOT EXISTS sessions (
@@ -200,6 +204,7 @@ async function initDb() {
 			started_at timestamptz NOT NULL DEFAULT now(), completed_at timestamptz,
 			config jsonb, user_agent text, screen_w integer, screen_h integer
 		);
+		ALTER TABLE sessions ADD COLUMN IF NOT EXISTS hand text;
 		CREATE TABLE IF NOT EXISTS submissions (
 			id text PRIMARY KEY, session_id text, kind text, created_at timestamptz NOT NULL DEFAULT now()
 		);
@@ -303,9 +308,9 @@ async function createSession(body, req) {
 		const id = crypto.randomUUID();
 		const screen = body.screen || {};
 		await client.query(
-			'INSERT INTO sessions (id, pid, config, user_agent, screen_w, screen_h) VALUES ($1, $2, $3, $4, $5, $6)',
+			'INSERT INTO sessions (id, pid, config, user_agent, screen_w, screen_h, hand) VALUES ($1, $2, $3, $4, $5, $6, $7)',
 			[id, pid, JSON.stringify(config), String(req.headers['user-agent'] || '').slice(0, 400),
-				clampInt(screen.w, 0, 100000, null), clampInt(screen.h, 0, 100000, null)]
+				clampInt(screen.w, 0, 100000, null), clampInt(screen.h, 0, 100000, null), handOrNull(body.hand)]
 		);
 		await client.query('COMMIT');
 		return { sessionId: id, pid, config };
@@ -317,11 +322,13 @@ async function createSession(body, req) {
 	}
 }
 
-async function sessionPid(client, sessionId) {
+const handOrNull = v => (v === 'left' || v === 'right' ? v : null);
+
+async function sessionInfo(client, sessionId) {
 	if (!isId(sessionId)) throw badRequest('Invalid session');
-	const r = await client.query('SELECT pid FROM sessions WHERE id = $1', [sessionId]);
+	const r = await client.query('SELECT pid, hand FROM sessions WHERE id = $1', [sessionId]);
 	if (!r.rows[0]) throw badRequest('Unknown session');
-	return r.rows[0].pid;
+	return r.rows[0];
 }
 
 const num = v => (typeof v === 'number' && Number.isFinite(v) ? v : null);
@@ -334,12 +341,12 @@ async function onceForSubmission(body, kind, insert) {
 	const client = await pool.connect();
 	try {
 		await client.query('BEGIN');
-		const pid = await sessionPid(client, body.sessionId);
+		const session = await sessionInfo(client, body.sessionId);
 		const fresh = await client.query(
 			'INSERT INTO submissions (id, session_id, kind) VALUES ($1, $2, $3) ON CONFLICT (id) DO NOTHING RETURNING id',
 			[body.submissionId, body.sessionId, kind]
 		);
-		if (fresh.rowCount) await insert(client, pid);
+		if (fresh.rowCount) await insert(client, session);
 		await client.query('COMMIT');
 	} catch (err) {
 		await client.query('ROLLBACK').catch(() => { });
@@ -365,18 +372,18 @@ async function submitTmt(body) {
 	};
 	const arrays = cols.map(c => s[c].map(conv[c]));
 
-	await onceForSubmission(body, `${body.task}:${blockno}`, (client, pid) => client.query(
+	await onceForSubmission(body, `${body.task}:${blockno}`, (client, { pid, hand }) => client.query(
 		`INSERT INTO test_results (pid, blockno, coordx, coordy, coordt, realpointid, realpointx, realpointy, fakepointid,
 			fakepointx, fakepointy, speed, pausevalue, correctangle, wrongangle, err, errorcorrected,
-			task, session_id, screen_w, screen_h, node_radius, created_at)
+			task, session_id, screen_w, screen_h, node_radius, hand, created_at)
 		 SELECT $1, $2, x.a, x.b, x.c, x.d, x.e, x.f, x.g, x.h, x.i, x.j, x.k, x.l, x.m, x.n, x.o,
-			$18, $19, $20, $21, $22, now()
+			$18, $19, $20, $21, $22, $23, now()
 		 FROM unnest($3::int[], $4::int[], $5::int[], $6::text[], $7::float8[], $8::float8[], $9::text[], $10::float8[],
 			$11::float8[], $12::float8[], $13::int[], $14::float8[], $15::float8[], $16::int[], $17::int[])
 			WITH ORDINALITY AS x(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, ord)
 		 ORDER BY x.ord`,
 		[pid, blockno, ...arrays, body.task, body.sessionId, clampInt(body.screenW, 0, 100000, null),
-			clampInt(body.screenH, 0, 100000, null), num(body.nodeRadius)]
+			clampInt(body.screenH, 0, 100000, null), num(body.nodeRadius), hand]
 	));
 }
 
@@ -386,12 +393,12 @@ async function submitSwipe(body) {
 	if (n < 1 || n > 200000 || !['coordy', 'coordt'].every(c => Array.isArray(s[c]) && s[c].length === n)) {
 		throw badRequest('Invalid samples');
 	}
-	await onceForSubmission(body, 'swipe', (client, pid) => client.query(
-		`INSERT INTO max_speed (pid, coordx, coordy, coordt, session_id, screen_w, screen_h, created_at)
-		 SELECT $1, x.a, x.b, x.c, $5, $6, $7, now()
+	await onceForSubmission(body, 'swipe', (client, { pid, hand }) => client.query(
+		`INSERT INTO max_speed (pid, coordx, coordy, coordt, session_id, screen_w, screen_h, hand, created_at)
+		 SELECT $1, x.a, x.b, x.c, $5, $6, $7, $8, now()
 		 FROM unnest($2::int[], $3::int[], $4::int[]) WITH ORDINALITY AS x(a, b, c, ord) ORDER BY x.ord`,
 		[pid, s.coordx.map(int), s.coordy.map(int), s.coordt.map(int), body.sessionId,
-			clampInt(body.screenW, 0, 100000, null), clampInt(body.screenH, 0, 100000, null)]
+			clampInt(body.screenW, 0, 100000, null), clampInt(body.screenH, 0, 100000, null), hand]
 	));
 }
 
@@ -406,11 +413,13 @@ async function listParticipants() {
 		pool.query(`SELECT pid, count(DISTINCT coalesce(session_id, ''))::int AS runs, max(created_at) AS last
 			FROM max_speed WHERE pid IS NOT NULL GROUP BY pid`),
 		pool.query(`SELECT pid, count(*)::int AS sessions, max(started_at) AS last,
-			bool_or(completed_at IS NOT NULL) AS completed FROM sessions GROUP BY pid`),
+			bool_or(completed_at IS NOT NULL) AS completed,
+			(array_agg(hand ORDER BY started_at DESC) FILTER (WHERE hand IS NOT NULL))[1] AS hand
+			FROM sessions GROUP BY pid`),
 	]);
 	const by = new Map();
 	const get = pid => {
-		if (!by.has(pid)) by.set(pid, { pid, sessions: 0, completed: false, tmt_a: 0, tmt_b: 0, swipe: 0, wrong: 0, last: null });
+		if (!by.has(pid)) by.set(pid, { pid, sessions: 0, completed: false, hand: null, tmt_a: 0, tmt_b: 0, swipe: 0, wrong: 0, last: null });
 		return by.get(pid);
 	};
 	const later = (a, b) => (!a ? b : !b ? a : new Date(a) > new Date(b) ? a : b);
@@ -421,7 +430,7 @@ async function listParticipants() {
 		p.last = later(p.last, r.last);
 	}
 	for (const r of m.rows) { const p = get(r.pid); p.swipe = r.runs; p.last = later(p.last, r.last); }
-	for (const r of s.rows) { const p = get(r.pid); p.sessions = r.sessions; p.completed = r.completed; p.last = later(p.last, r.last); }
+	for (const r of s.rows) { const p = get(r.pid); p.sessions = r.sessions; p.completed = r.completed; p.hand = r.hand; p.last = later(p.last, r.last); }
 	return [...by.values()].sort((a, b) => b.pid - a.pid);
 }
 
@@ -434,7 +443,7 @@ async function participantDetail(pid) {
 			sum(CASE WHEN err = 1 THEN 1 ELSE 0 END)::int AS off_course,
 			min(created_at) AS created_at, min(id) AS first_id
 			FROM test_results WHERE pid = $1 GROUP BY session_id, task, blockno ORDER BY min(id)`, [pid]),
-		pool.query('SELECT id, started_at, completed_at, user_agent, screen_w, screen_h, config FROM sessions WHERE pid = $1 ORDER BY started_at', [pid]),
+		pool.query('SELECT id, started_at, completed_at, user_agent, screen_w, screen_h, hand, config FROM sessions WHERE pid = $1 ORDER BY started_at', [pid]),
 		pool.query('SELECT session_id, coordx, coordy, coordt, screen_w, screen_h, created_at FROM max_speed WHERE pid = $1 ORDER BY id', [pid]),
 	]);
 	return { pid, blocks: blocks.rows, sessions: sessions.rows, swipe: swipe.rows };
@@ -563,6 +572,14 @@ const server = http.createServer(async (req, res) => {
 
 		if (pathname === '/api/config' && req.method === 'GET') return sendJson(res, 200, { config: await getConfig() });
 		if (pathname === '/api/session' && req.method === 'POST') return sendJson(res, 200, await createSession(await readJson(req), req));
+		if (pathname === '/api/session/hand' && req.method === 'POST') {
+			const body = await readJson(req);
+			if (!isId(body.sessionId)) throw badRequest('Invalid session');
+			const hand = handOrNull(body.hand);
+			if (!hand) throw badRequest('Invalid hand');
+			await pool.query('UPDATE sessions SET hand = $2 WHERE id = $1', [body.sessionId, hand]);
+			return sendJson(res, 200, { ok: true });
+		}
 		if (pathname === '/api/session/complete' && req.method === 'POST') {
 			const body = await readJson(req);
 			if (!isId(body.sessionId)) throw badRequest('Invalid session');
