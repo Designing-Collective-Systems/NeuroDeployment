@@ -48,6 +48,7 @@
     }
 
     function renderStepper(el, activeIdx, doneCount) {
+        if (!el) return; // progress strip is commented out in index.html
         el.innerHTML = '';
         state.plan.forEach((task, i) => {
             const li = document.createElement('li');
@@ -136,7 +137,8 @@
             li.innerHTML = `<span class="num" aria-hidden="true">${i + 1}</span>
                 <h2>Task ${i + 1}: ${TASK_INFO[task].title}</h2>
                 <p>${TASK_INFO[task].blurb(taskCfg(task))}</p>
-                <p class="times">You will do this ${times(n)}.${extra}</p>`;
+                <p class="times">You will do this ${times(n)}.</p>`;
+            // <p class="times">You will do this ${times(n)}.${extra}</p>`;
             list.appendChild(li);
         });
         const n = state.plan.length;
@@ -260,7 +262,8 @@
         const dot = $('finger-dot');
 
         show('screen-tmt');
-        $('tmt-progress').textContent = `Task ${state.taskIdx + 1} of ${state.plan.length} · Round ${blockno} of ${cfg.blocks}`;
+        // $('tmt-progress').textContent = `Task ${state.taskIdx + 1} of ${state.plan.length} · Round ${blockno} of ${cfg.blocks}`;
+        $('tmt-progress').textContent = `Round ${blockno} of ${cfg.blocks}`;
 
         let geo, r;
         function applyGeometry() {
@@ -450,7 +453,7 @@
         const liftNotice = $('swipe-lift');
 
         show('screen-swipe');
-        $('swipe-progress').textContent = `Task ${state.taskIdx + 1} of ${state.plan.length}`;
+        // $('swipe-progress').textContent = `Task ${state.taskIdx + 1} of ${state.plan.length}`;
         timeEl.textContent = cfg.durationSec;
         prompt.hidden = false;
         prompt.textContent = 'Place your finger on the screen to start.';

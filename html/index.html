@@ -3,7 +3,8 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <link href="style.css" rel="stylesheet" />
     <link rel="icon" href="data:,">
@@ -32,8 +33,10 @@
     <!-- 1. Welcome -->
     <section class="screen page" id="screen-welcome" hidden>
         <h1 class="title">Welcome</h1>
-        <p class="lead">This task measures how quickly and accurately you can move your finger between dots on a screen.</p>
-        <div class="actions"><button class="btn btn-action btn-wide" id="welcome-next">Okay, tell me more!</button></div>
+        <p class="lead">This task measures how quickly and accurately you can move your finger between dots on a screen.
+        </p>
+        <div class="actions"><button class="btn btn-action btn-wide" id="welcome-next">Okay, tell me more!</button>
+        </div>
     </section>
 
     <!-- 2. Overview of the tasks -->
@@ -51,7 +54,7 @@
     <!-- 3. Task introduction: demo + original instructions -->
     <section class="screen page" id="screen-intro" hidden>
         <div class="task-header">
-            <ol class="stepper" id="intro-stepper" aria-label="Task progress"></ol>
+            <!-- <ol class="stepper" id="intro-stepper" aria-label="Task progress"></ol> -->
             <p class="task-kicker" id="intro-kicker">Task 1 of 3</p>
             <h1 class="title" id="intro-title">Connect the numbers</h1>
         </div>
@@ -72,14 +75,10 @@
         <div class="instruction-page">
             <p>The aim of this task is to slide your finger from one dot to another.
                 While doing this, you will need to follow some rules.</p>
-        </div>
-        <div class="instruction-page">
             <p><strong>Getting started:</strong></p>
             <p>Begin by placing your finger on the dot with the number 1.</p>
             <p>Slide your finger from 1 to the dot with the letter A. </p>
             <p>After this, move to the dot with the number 2.</p>
-        </div>
-        <div class="instruction-page">
             <p><strong>Continue moving:</strong></p>
             <p>Number first, followed by the next letter.</p>
         </div>
@@ -96,16 +95,12 @@
         <div class="instruction-page">
             <p>The aim of this task is to slide your finger from one dot to another.
                 While doing this, you will need to follow some rules.</p>
-        </div>
-        <div class="instruction-page">
             <p><strong>Getting started:</strong></p>
             <p>Begin by placing your finger on the dot with the number 1.</p>
             <p>Slide your finger from 1 to the dot with the number 2. </p>
             <p>After this, move to the dot with the number 3.</p>
-        </div>
-        <div class="instruction-page">
             <p><strong>Continue moving:</strong></p>
-            <p>Numbers only, in order: 1, 2, 3, 4 and so on.</p>
+            <p>In order: 1, 2, 3, 4 and so on.</p>
         </div>
         <div class="instruction-page">
             <p><strong>Guidelines:</strong></p>
@@ -119,7 +114,8 @@
         <div class="instruction-page">
             <ol>
                 <li>The aim of this task is to slide your finger as fast as possible.</li>
-                <li>Start the task by placing your finger on the screen. This will start a <span data-duration>10</span> second timer.</li>
+                <li>Start the task by placing your finger on the screen. This will start a <span data-duration>10</span>
+                    second timer.</li>
                 <li>Slide your finger in any direction.</li>
                 <li>Continue moving your finger as fast as possible until the timer hits 0.</li>
                 <li>Do not lift your finger from the screen while performing this task.</li>
@@ -130,7 +126,7 @@
     <!-- 4a. Crossroads task (A or B) -->
     <section class="screen task-screen" id="screen-tmt" hidden>
         <div class="task-bar" id="tmt-bar">
-            <p class="chip" id="tmt-progress">Task 1 of 3 · Round 1 of 3</p>
+            <p class="chip" id="tmt-progress"><!-- Task 1 of 3 · -->Round 1 of 3</p>
             <p class="prompt" id="tmt-prompt" aria-live="polite">Place your finger on dot 1 to begin</p>
         </div>
         <div class="task-area" id="tmt-area">
@@ -144,11 +140,12 @@
     <!-- 4b. Swiping task -->
     <section class="screen task-screen" id="screen-swipe" hidden>
         <div class="task-bar swipe-bar">
-            <p class="chip" id="swipe-progress">Task 3 of 3</p>
+            <!-- <p class="chip" id="swipe-progress">Task 3 of 3</p> -->
             <div id="timer">Continue swiping for: <span id="time">10</span> seconds!</div>
             <p class="prompt" id="swipe-prompt" aria-live="polite">Place your finger on the screen to start.</p>
             <div class="notice notice-warn" id="swipe-lift" hidden role="status">
-                <div class="notice-title"><span class="notice-icon" aria-hidden="true">!</span> You lifted your finger</div>
+                <div class="notice-title"><span class="notice-icon" aria-hidden="true">!</span> You lifted your finger
+                </div>
                 <p>Put your finger back on the screen and keep going. The timer will continue.</p>
             </div>
         </div>
@@ -157,9 +154,10 @@
 
     <!-- 5. Task complete -->
     <section class="screen page" id="screen-taskdone" hidden>
-        <ol class="stepper" id="done-stepper" aria-label="Task progress"></ol>
+        <!-- <ol class="stepper" id="done-stepper" aria-label="Task progress"></ol> -->
         <div class="notice notice-success" role="status">
-            <div class="notice-title"><span class="notice-icon" aria-hidden="true">✓</span> <span id="done-title">Completed task 1/3</span></div>
+            <div class="notice-title"><span class="notice-icon" aria-hidden="true">✓</span> <span
+                    id="done-title">Completed task 1/3</span></div>
             <p id="done-text">Well done.</p>
         </div>
         <div class="actions"><button class="btn btn-action btn-wide" id="done-next">Continue to task 2</button></div>
@@ -167,17 +165,19 @@
 
     <!-- 6. Thanks -->
     <section class="screen page" id="screen-thanks" hidden>
-        <ol class="stepper" id="thanks-stepper" aria-label="Task progress"></ol>
+        <!-- <ol class="stepper" id="thanks-stepper" aria-label="Task progress"></ol> -->
         <h1 class="title">Thanks for participating!</h1>
-        <p class="lead">All tasks are complete. You can hand the device back to the researcher.</p>
+        <p class="lead">All tasks are complete!</p>
         <p class="muted" id="thanks-sync"></p>
         <div class="actions"><button class="btn btn-secondary" id="thanks-restart">Back</button></div>
     </section>
 
     <!-- Error dialogs (red) -->
     <div class="dialog-backdrop" id="dialog-error" hidden>
-        <div class="dialog dialog-error" role="alertdialog" aria-labelledby="dialog-error-title" aria-describedby="dialog-error-text">
-            <div class="dialog-head"><span class="notice-icon" aria-hidden="true">!</span> <span id="dialog-error-title">Incorrect Point</span></div>
+        <div class="dialog dialog-error" role="alertdialog" aria-labelledby="dialog-error-title"
+            aria-describedby="dialog-error-text">
+            <div class="dialog-head"><span class="notice-icon" aria-hidden="true">!</span> <span
+                    id="dialog-error-title">Incorrect Point</span></div>
             <p class="dialog-text" id="dialog-error-text">Incorrect Point, go back to the last point and try again</p>
             <button class="btn btn-action btn-block" id="dialog-error-ok">OK</button>
         </div>
@@ -186,7 +186,8 @@
     <!-- Confirmation dialog (green): round complete -->
     <div class="dialog-backdrop" id="dialog-round" hidden>
         <div class="dialog dialog-success" role="dialog" aria-labelledby="dialog-round-title">
-            <div class="dialog-head"><span class="notice-icon" aria-hidden="true">✓</span> <span id="dialog-round-title">Round 1 of 8 complete</span></div>
+            <div class="dialog-head"><span class="notice-icon" aria-hidden="true">✓</span> <span
+                    id="dialog-round-title">Round 1 of 8 complete</span></div>
             <p class="dialog-text">Please repeat the task.</p>
             <button class="btn btn-action btn-block" id="dialog-round-ok">Start round 2</button>
         </div>
