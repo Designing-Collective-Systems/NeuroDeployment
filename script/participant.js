@@ -47,8 +47,57 @@
     function show(id) {
         if (stopDemo && id !== 'screen-intro') { stopDemo(); stopDemo = null; }
         document.querySelectorAll('.screen').forEach(s => { s.hidden = s.id !== id; });
-        window.scrollTo(0, 0);
+        fitPage();
     }
+
+    // ------------------------------------------------------------ fit to screen
+    // Nothing in the app scrolls. The demonstration takes whatever height is left over;
+    // text and buttons only shrink (--fit) if a page still doesn't fit after that.
+    const MIN_FIT = 0.6, MIN_DEMO = 120, MAX_DEMO = 420;
+
+    function sizeDemo(page) {
+        const fig = $('intro-demo');
+        if (fig.hidden) return true;
+        const wrap = fig.querySelector('.demo-canvas-wrap');
+        const body = fig.parentElement;
+        wrap.style.width = wrap.style.height = '0px';
+        const cs = getComputedStyle(page);
+        const inner = page.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
+        const kids = [...page.children].filter(k => !k.hidden);
+        const used = kids[kids.length - 1].getBoundingClientRect().bottom - kids[0].getBoundingClientRect().top;
+        const beside = getComputedStyle(body).flexDirection === 'row';
+        const free = beside
+            ? inner - (used - body.getBoundingClientRect().height) - fig.getBoundingClientRect().height
+            : inner - used;
+        const h = Math.floor(Math.min(free, fig.clientWidth * 0.75, MAX_DEMO));
+        const ok = h >= MIN_DEMO;
+        const size = ok ? h : MIN_DEMO;
+        wrap.style.height = `${size}px`;
+        wrap.style.width = `${Math.floor(size * 4 / 3)}px`;
+        return ok;
+    }
+
+    function fitPage() {
+        const page = document.querySelector('.screen.page:not([hidden])');
+        if (!page) return;
+        page.classList.remove('no-fit');
+        for (let fit = 1; fit >= MIN_FIT - 0.001; fit -= 0.05) {
+            page.style.setProperty('--fit', fit.toFixed(2));
+            const demoOk = page.id !== 'screen-intro' || sizeDemo(page);
+            if (demoOk && page.scrollHeight <= page.clientHeight + 1 && page.scrollWidth <= page.clientWidth + 1) return;
+        }
+        page.classList.add('no-fit');
+    }
+
+    let fitQueued = false;
+    function queueFit() {
+        if (fitQueued) return;
+        fitQueued = true;
+        requestAnimationFrame(() => { fitQueued = false; fitPage(); });
+    }
+    window.addEventListener('resize', queueFit);
+    window.addEventListener('orientationchange', queueFit);
+    if (window.visualViewport) window.visualViewport.addEventListener('resize', queueFit);
 
     function renderStepper(el, activeIdx, doneCount) {
         if (!el) return; // progress strip is commented out in index.html
@@ -167,7 +216,7 @@
         pagesEl.appendChild($(`instructions-${task}`).content.cloneNode(true));
         pagesEl.querySelectorAll('[data-duration]').forEach(el => { el.textContent = taskCfg('swipe').durationSec; });
         const pages = [...pagesEl.querySelectorAll('.instruction-page')];
-        pages.forEach((p, i) => { p.hidden = i !== page; });
+        pages.forEach((p, i) => { p.classList.toggle('off', i !== page); });
         $('intro-pagecount').textContent = pages.length > 1 ? `Page ${page + 1} of ${pages.length}` : '';
 
         const last = page === pages.length - 1;
@@ -179,6 +228,7 @@
         show('screen-intro');
         const demoOn = state.config.guidance.showDemo;
         $('intro-demo').hidden = !demoOn;
+        fitPage();
         if (demoOn && (wasHidden || !stopDemo)) {
             stopDemo = window.TMTDemo.start($('demo-canvas'), $('demo-caption'), {
                 task,

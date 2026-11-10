@@ -34,6 +34,7 @@
 
     --radius: 16px;
     --text: clamp(1.25rem, 1rem + 1.2vw, 2rem);
+    --fit: 1; /* set per page by fitPage() in participant.js: shrinks a page until it fits the screen */
 }
 
 *, *::before, *::after { box-sizing: border-box; }
@@ -41,6 +42,7 @@
 html, body {
     margin: 0;
     height: 100%;
+    overflow: hidden; /* nothing in the participant app scrolls */
     background: var(--surface);
     color: var(--ink);
     font-family: Arial, Helvetica, sans-serif;
@@ -55,57 +57,68 @@ html, body {
 
 .muted { color: var(--ink-muted); }
 
-/* ---------- Text pages ---------- */
+/* ---------- Text pages ----------
+   Each page is locked to the screen. Sizes below scale with --fit, and fitPage() lowers it
+   only if a page would otherwise not fit. Auto margins centre the content (rather than
+   justify-content: center) so any overflow is measurable at the bottom. */
 .screen.page {
-    min-height: 100%;
-    max-width: 60rem;
-    margin: 0 auto;
-    padding: max(2rem, env(safe-area-inset-top)) clamp(1rem, 5vw, 3rem) max(2rem, env(safe-area-inset-bottom));
+    position: fixed;
+    inset: 0;
+    overflow: hidden;
+    padding-block: max(calc(2rem * var(--fit)), env(safe-area-inset-top)) max(calc(2rem * var(--fit)), env(safe-area-inset-bottom));
+    padding-inline: max(clamp(1rem, 5vw, 3rem), calc((100% - 60rem) / 2));
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    gap: 1.25rem;
-    font-size: var(--text);
+    gap: calc(1.25rem * var(--fit));
+    font-size: calc(var(--text) * var(--fit));
 }
+.screen.page > :first-child { margin-top: auto; }
+.screen.page > :last-child { margin-bottom: auto; }
+/* last resort, if a page cannot fit even at the smallest size: nothing may become unreachable */
+.screen.page.no-fit { overflow-y: auto; }
 
 .title {
     text-align: center;
-    font-size: clamp(1.75rem, 1.2rem + 2vw, 2.75rem);
+    font-size: calc(clamp(1.75rem, 1.2rem + 2vw, 2.75rem) * var(--fit));
     margin: 0;
 }
 
 .lead {
-    font-size: calc(var(--text) * 1.1);
+    font-size: 1.1em;
     line-height: 1.4;
     text-align: center;
     margin: 0;
 }
 
 .instructions {
+    display: grid; /* all pages share one cell, so the layout stays put when moving between them */
     text-align: left;
     line-height: 1.45;
 }
+.instruction-page { grid-area: 1 / 1; }
+.instruction-page.off { visibility: hidden; }
 .instructions p { margin: 0 0 0.6em; }
-.instructions li { margin: 0.6rem 0; }
+.instructions ol { margin: 0; }
+.instructions li { margin: 0.6em 0; }
 
-.page-count { text-align: center; font-size: 1rem; margin: 0; }
+.page-count { text-align: center; font-size: calc(1rem * var(--fit)); margin: 0; }
 
 /* ---------- Buttons ---------- */
 .actions {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-    gap: 1rem;
-    margin-top: 0.5rem;
+    gap: calc(1rem * var(--fit));
+    margin-top: calc(0.5rem * var(--fit));
 }
 
 .btn {
-    min-height: 72px;
+    min-height: max(60px, calc(72px * var(--fit)));
     min-width: 9rem;
-    padding: 0.75rem 2rem;
+    padding: calc(0.75rem * var(--fit)) 2rem;
     border-radius: 14px;
     font: inherit;
-    font-size: clamp(1.25rem, 1rem + 1vw, 1.75rem);
+    font-size: calc(clamp(1.25rem, 1rem + 1vw, 1.75rem) * var(--fit));
     font-weight: 700;
     cursor: pointer;
     touch-action: manipulation;
@@ -138,7 +151,7 @@ html, body {
     margin: 0 auto;
 }
 .btn-choice {
-    min-height: 180px;
+    min-height: max(96px, calc(180px * var(--fit)));
     display: grid;
     justify-items: center;
     align-content: center;
@@ -159,22 +172,22 @@ html, body {
     padding: 0;
     margin: 0;
     display: grid;
-    gap: 1rem;
+    gap: calc(1rem * var(--fit));
 }
 .task-card {
     display: grid;
     grid-template-columns: auto 1fr;
     gap: 0.25rem 1rem;
     align-items: start;
-    padding: 1rem 1.25rem;
+    padding: calc(1rem * var(--fit)) 1.25rem;
     border: 2px solid var(--line);
     border-radius: var(--radius);
     background: var(--surface-2);
 }
 .task-card .num {
     grid-row: span 3;
-    width: 3rem;
-    height: 3rem;
+    width: 2.2em;
+    height: 2.2em;
     border-radius: 50%;
     background: var(--ink);
     color: #fff;
@@ -182,19 +195,19 @@ html, body {
     place-items: center;
     font-weight: 700;
 }
-.task-card h2 { margin: 0; font-size: calc(var(--text) * 1.05); }
+.task-card h2 { margin: 0; font-size: 1.05em; }
 .task-card p { margin: 0; line-height: 1.35; }
 .task-card .times { font-weight: 700; }
 
 /* ---------- Task intro ---------- */
-.task-header { display: grid; gap: 0.5rem; justify-items: center; }
+.task-header { display: grid; gap: calc(0.5rem * var(--fit)); justify-items: center; }
 .task-kicker {
     margin: 0;
     font-weight: 700;
     color: var(--action);
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    font-size: 1.1rem;
+    font-size: calc(1.1rem * var(--fit));
 }
 
 .stepper {
@@ -220,15 +233,38 @@ html, body {
 .stepper li.done { border-color: var(--success-line); background: var(--success-bg); color: var(--success); font-weight: 700; }
 .stepper li.current { border-color: var(--action); color: var(--action); font-weight: 700; }
 
+.intro-body {
+    display: flex;
+    flex-direction: column;
+    gap: calc(1.25rem * var(--fit));
+}
 .demo {
     margin: 0;
     display: grid;
-    gap: 0.5rem;
+    gap: calc(0.5rem * var(--fit));
     justify-items: center;
 }
+/* Landscape: demonstration beside the text, so neither has to shrink much */
+@media (orientation: landscape) {
+    .intro-body { flex-direction: row; align-items: center; gap: 2rem; }
+    .intro-body .demo { flex: 0 0 46%; }
+    .intro-body .instructions { flex: 1 1 0; min-width: 0; }
+    .task-cards { grid-template-columns: repeat(auto-fit, minmax(0, 1fr)); grid-auto-flow: column; }
+    .task-card { grid-template-columns: 1fr; align-content: start; }
+    .task-card .num { grid-row: auto; }
+}
+/* Phone in landscape: the text needs the width, and buttons can be a little smaller */
+@media (max-height: 480px) {
+    .intro-body .demo { flex-basis: 30%; }
+    .intro-body { gap: 1rem; }
+    .btn { min-height: 48px; }
+    .actions .btn { min-width: 7rem; }
+}
+/* fitPage() sets the exact size of this box from the space left on the page */
 .demo-canvas-wrap {
     width: min(100%, 34rem);
     aspect-ratio: 4 / 3;
+    max-width: 100%;
     border: 2px solid var(--line);
     border-radius: var(--radius);
     background: #fafafa;
@@ -236,10 +272,11 @@ html, body {
 }
 .demo canvas { width: 100%; height: 100%; display: block; }
 .demo figcaption {
-    font-size: 1.1rem;
+    font-size: calc(1.1rem * var(--fit));
     font-weight: 700;
     color: var(--ink-muted);
-    min-height: 1.5em;
+    line-height: 1.3;
+    min-height: 2.6em; /* room for two lines: the caption changes as the demo plays, and must not move the page */
     text-align: center;
 }
 
@@ -247,7 +284,7 @@ html, body {
 .notice {
     border: 3px solid;
     border-radius: var(--radius);
-    padding: 1rem 1.25rem;
+    padding: calc(1rem * var(--fit)) 1.25rem;
 }
 .notice p { margin: 0.4rem 0 0; line-height: 1.35; }
 .notice-title { font-weight: 700; display: flex; align-items: center; gap: 0.6rem; }
@@ -282,6 +319,7 @@ html, body {
 }
 .dialog {
     width: min(100%, 30rem);
+    max-height: 100%;
     background: var(--surface);
     border-radius: 20px;
     border-top: 14px solid;
@@ -302,6 +340,10 @@ html, body {
 .dialog-success .dialog-head { color: var(--success); }
 .dialog-success .notice-icon { background: var(--success); }
 .dialog .btn { min-height: 88px; font-size: clamp(1.5rem, 1.2rem + 1vw, 2rem); }
+@media (max-height: 480px) {
+    .dialog { padding: 0.75rem 1rem; gap: 0.5rem; border-top-width: 8px; font-size: 1.1rem; }
+    .dialog .btn { min-height: 64px; }
+}
 
 @keyframes pop { from { transform: scale(0.94); opacity: 0; } to { transform: none; opacity: 1; } }
 
